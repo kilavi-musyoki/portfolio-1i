@@ -1,0 +1,486 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Syne:wght@400..800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== CSS Variables ===== */
+:root {
+  --base: #0A0A0F;
+  --pcb-green: #00FF88;
+  --cap-cyan: #4DFFFF;
+  --alert-red: #FF3D00;
+  --solder-gold: #D4A843;
+  --pcb-beige: #F5F0E8;
+  --deep-navy: #1A1A2E;
+  --backlit-white: #FFFDF7;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Syne', sans-serif;
+}
+
+/* ===== Base Reset ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-mono);
+  background: var(--base);
+  color: #e0ffe8;
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+/* Light mode body */
+body.light-mode {
+  background: var(--pcb-beige);
+  color: var(--deep-navy);
+}
+
+/* ===== Noise Texture Overlay ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ===== Scanline Overlay ===== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 136, 0.015) 2px,
+    rgba(0, 255, 136, 0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Light mode — no scanlines */
+body.light-mode::after {
+  opacity: 0;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #00FF88;
+  border-radius: 2px;
+}
+
+body.light-mode ::-webkit-scrollbar-track {
+  background: var(--pcb-beige);
+}
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: var(--solder-gold, #D4A843);
+}
+
+/* ===== Selection ===== */
+::selection {
+  background: rgba(0, 255, 136, 0.3);
+  color: #00FF88;
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== Board Container ===== */
+.board-container {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* ===== PCB Trace Animation ===== */
+.pcb-trace {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+
+.pcb-trace.animated {
+  animation: trace-draw 2s ease-out forwards;
+}
+
+@keyframes trace-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ===== Bootloader Terminal ===== */
+.boot-terminal {
+  font-family: var(--font-mono);
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.15), inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.boot-line {
+  opacity: 0;
+  animation: boot-line-appear 0.3s ease-out forwards;
+}
+
+@keyframes boot-line-appear {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== Glitch Effect ===== */
+.glitch-flash {
+  animation: glitch-flash 0.3s steps(1) forwards;
+}
+
+@keyframes glitch-flash {
+  0% { filter: hue-rotate(0deg); }
+  20% { filter: hue-rotate(90deg) brightness(1.5); }
+  40% { filter: hue-rotate(180deg) contrast(1.2); }
+  60% { filter: hue-rotate(270deg) brightness(0.8); }
+  80% { filter: hue-rotate(360deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+/* ===== Section Base ===== */
+.section-base {
+  min-height: 100vh;
+  padding: 5rem 2.5rem;
+  position: relative;
+}
+
+/* ===== PCB Module Card ===== */
+.pcb-card {
+  background: rgba(0, 255, 136, 0.03);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 4px;
+  position: relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.pcb-card:hover {
+  border-color: rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+body.light-mode .pcb-card {
+  background: rgba(212, 168, 67, 0.05);
+  border-color: rgba(212, 168, 67, 0.3);
+}
+body.light-mode .pcb-card:hover {
+  border-color: rgba(212, 168, 67, 0.7);
+  box-shadow: 0 0 20px rgba(212, 168, 67, 0.15);
+}
+
+/* ===== Skill Bar ===== */
+.skill-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 255, 136, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.5s ease-out;
+}
+
+/* ===== Oscilloscope ===== */
+.oscilloscope-container {
+  background: #000810;
+  border: 2px solid rgba(0, 255, 136, 0.4);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.oscilloscope-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ===== Changelog Entry ===== */
+.changelog-entry {
+  border-left: 2px solid rgba(0, 255, 136, 0.3);
+  padding-left: 1.5rem;
+  position: relative;
+  transition: border-color 0.3s;
+}
+.changelog-entry::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 0.4rem;
+  width: 8px;
+  height: 8px;
+  background: var(--pcb-green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--pcb-green);
+}
+.changelog-entry:hover {
+  border-color: var(--pcb-green);
+}
+
+/* ===== Power Switch (Theme Toggle) ===== */
+.power-switch {
+  width: 48px;
+  height: 26px;
+  background: rgba(255, 61, 0, 0.3);
+  border: 1.5px solid rgba(255, 61, 0, 0.5);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s;
+}
+.power-switch.on {
+  background: rgba(0, 255, 136, 0.3);
+  border-color: rgba(0, 255, 136, 0.5);
+}
+.power-switch-lever {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #888 0%, #555 100%);
+  border-radius: 2px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.power-switch.on .power-switch-lever {
+  transform: translateX(22px);
+  background: linear-gradient(135deg, #D4A843 0%, #a07820 100%);
+}
+
+/* ===== Debug Overlay ===== */
+.debug-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 99999;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #00FF88;
+  padding: 1rem;
+}
+
+/* ===== Iris Transition Overlay ===== */
+.iris-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0A0A0F;
+  z-index: 99990;
+  transform: scale(0);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ===== Tractor Beam ===== */
+.tractor-beam {
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 80px;
+  background: radial-gradient(ellipse at top, rgba(0, 255, 136, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+  transition: transform 0.1s ease;
+}
+
+/* ===== Board Eye (LED) ===== */
+.board-eye {
+  transition: filter 0.1s ease;
+}
+
+/* ===== Form Inputs ===== */
+.hud-input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 2px;
+  color: #e0ffe8;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.hud-input:focus {
+  border-color: rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+}
+.hud-input::placeholder {
+  color: rgba(0, 255, 136, 0.3);
+  font-size: 0.75rem;
+}
+
+body.light-mode .hud-input {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(212, 168, 67, 0.3);
+  color: var(--deep-navy);
+}
+body.light-mode .hud-input:focus {
+  border-color: rgba(212, 168, 67, 0.7);
+  box-shadow: 0 0 10px rgba(212, 168, 67, 0.1);
+}
+body.light-mode .hud-input::placeholder {
+  color: rgba(26, 26, 46, 0.4);
+}
+
+/* ===== Tooltip ===== */
+.pcb-tooltip {
+  position: absolute;
+  background: rgba(0, 5, 15, 0.95);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #00FF88;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+}
+
+/* ===== Light mode accents ===== */
+body.light-mode {
+  --pcb-green: #00b360;
+  --cap-cyan: #0099cc;
+}
+
+body.light-mode .changelog-entry::before {
+  background: var(--solder-gold, #D4A843);
+  box-shadow: 0 0 8px var(--solder-gold, #D4A843);
+}
+body.light-mode .changelog-entry {
+  border-left-color: rgba(212, 168, 67, 0.4);
+}
+
+/* ===== Status bar ===== */
+.status-bar {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ===== Nav Glass ===== */
+.nav-glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10, 10, 15, 0.8);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+}
+body.light-mode .nav-glass {
+  background: rgba(245, 240, 232, 0.85);
+  border-bottom-color: rgba(212, 168, 67, 0.2);
+}
+
+/* ===== Spark Particle ===== */
+.spark {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #D4A843;
+  pointer-events: none;
+  z-index: 99997;
+}
+
+/* ===== Datasheet Table ===== */
+.datasheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.datasheet-table th {
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  color: rgba(0, 255, 136, 0.7);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.datasheet-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.08);
+  color: #b0ffcc;
+}
+.datasheet-table tr:last-child td { border-bottom: none; }
+
+body.light-mode .datasheet-table th {
+  border-bottom-color: rgba(212, 168, 67, 0.4);
+  color: rgba(26, 26, 46, 0.6);
+}
+body.light-mode .datasheet-table td {
+  border-bottom-color: rgba(212, 168, 67, 0.1);
+  color: var(--deep-navy);
+}
+
+/* ===== Responsive Layouts ===== */
+
+@media (max-width: 1024px) {
+  .section-base {
+    padding: 4rem 1.75rem;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-base {
+    padding: 3rem 1.5rem;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  .nav-glass {
+    padding-inline: 1rem !important;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-base {
+    padding: 2.75rem 1.25rem;
+  }
+
+  .boot-terminal {
+    padding-inline: 1rem;
+  }
+
+  .oscilloscope-container {
+    height: 80px;
+  }
+}
