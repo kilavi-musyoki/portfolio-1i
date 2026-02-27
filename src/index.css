@@ -430,11 +430,13 @@ body.light-mode .nav-glass {
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  line-height: 1.4;
 }
 .datasheet-table td {
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid rgba(75, 216, 160, 0.08);
   color: #c0f3de;
+  line-height: 1.5;
 }
 .datasheet-table tr:last-child td { border-bottom: none; }
 

@@ -3,7 +3,7 @@ import PCBBoard from '../components/Board.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BOOT_LINES = [
-    { text: 'SILICON SOUL v2.0 — INITIALIZING...', delay: 0, color: '#00FF88' },
+    { text: 'SILICON SOUL v2.0 — INITIALIZING...', delay: 0, color: '#4BD8A0' },
     { text: 'POST CHECK: RAM .................. OK', delay: 300, color: '#b0ffcc' },
     { text: 'POST CHECK: GPU .................. OK', delay: 600, color: '#b0ffcc' },
     { text: 'POST CHECK: PORTFOLIO.EXE ........ LOADED', delay: 900, color: '#b0ffcc' },
@@ -11,7 +11,7 @@ const BOOT_LINES = [
     { text: 'POST CHECK: RF_MODULE ............ CALIBRATED', delay: 1500, color: '#b0ffcc' },
     { text: 'POST CHECK: EGO_MODULE ........... WARN (within limits)', delay: 1800, color: '#D4A843' },
     { text: 'MOUNTING INTERFACE ...............', delay: 2100, color: '#4DFFFF' },
-    { text: 'SIGNAL ACQUIRED. WELCOME, OPERATOR.', delay: 2400, color: '#00FF88' },
+    { text: 'SIGNAL ACQUIRED. WELCOME, OPERATOR.', delay: 2400, color: '#4BD8A0' },
 ];
 
 const UPTIME_START = Date.now();
@@ -95,9 +95,9 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
     const beamX = (mousePos.x - 0.5) * 40;
     const beamY = (mousePos.y - 0.5) * 20;
 
-    const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-    const accentColor = isDark ? '#00FF88' : '#D4A843';
-    const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
+    const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
+    const accentColor = isDark ? '#4BD8A0' : '#D4A843';
+    const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
 
     return (
         <section
@@ -129,20 +129,20 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                             position: 'fixed', inset: 0, zIndex: 9990,
                             display: 'flex', flexDirection: 'column',
                             justifyContent: 'center', alignItems: 'center',
-                            background: '#000',
+                            background: isDark ? '#000' : 'rgba(245,240,232,0.96)',
                         }}
                     >
                         <div style={{ width: '90%', maxWidth: '600px' }}>
                             {/* Terminal window chrome */}
                             <div style={{
-                                borderBottom: '1px solid rgba(0,255,136,0.2)',
+                                borderBottom: `1px solid ${isDark ? 'rgba(75,216,160,0.3)' : 'rgba(199,154,77,0.4)'}`,
                                 paddingBottom: '8px', marginBottom: '16px',
                                 display: 'flex', gap: '8px', alignItems: 'center',
                             }}>
-                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF3D00' }} />
+                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: isDark ? '#FF5A3C' : '#D68C45' }} />
                                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#D4A843' }} />
-                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#00FF88' }} />
-                                <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: 'rgba(0,255,136,0.4)', marginLeft: '8px' }}>
+                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: isDark ? '#4BD8A0' : '#7FB79A' }} />
+                                <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: isDark ? 'rgba(75,216,160,0.5)' : 'rgba(26,26,46,0.5)', marginLeft: '8px' }}>
                                     SILICON_SOUL_BIOS v2.0
                                 </span>
                             </div>
@@ -171,15 +171,17 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                             </div>
 
                             {/* Progress bar */}
-                            <div style={{ marginTop: '24px' }}>
+                                <div style={{ marginTop: '24px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: 'rgba(0,255,136,0.5)' }}>LOADING INTERFACE</span>
-                                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: '#00FF88' }}>{progress}%</span>
+                                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: isDark ? 'rgba(75,216,160,0.6)' : 'rgba(80,72,60,0.7)' }}>LOADING INTERFACE</span>
+                                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: isDark ? '#4BD8A0' : '#C79A4D' }}>{progress}%</span>
                                 </div>
-                                <div style={{ height: '2px', background: 'rgba(0,255,136,0.1)', borderRadius: '1px' }}>
+                                <div style={{ height: '2px', background: isDark ? 'rgba(75,216,160,0.15)' : 'rgba(199,154,77,0.15)', borderRadius: '1px' }}>
                                     <div style={{
                                         height: '100%', width: `${progress}%`,
-                                        background: 'linear-gradient(90deg, #00FF88, #4DFFFF)',
+                                        background: isDark
+                                            ? 'linear-gradient(90deg, #4BD8A0, #6FD4FF)'
+                                            : 'linear-gradient(90deg, #D4A843, #EBD3A1)',
                                         borderRadius: '1px',
                                         transition: 'width 0.3s ease',
                                         boxShadow: '0 0 8px rgba(0,255,136,0.5)',
@@ -358,7 +360,7 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                             }} />
 
                             {/* Board */}
-                            <PCBBoard layer={layer} className="" />
+                            <PCBBoard layer={layer} className="" isDark={isDark} />
 
                             {/* LED eye overlay (tracks cursor) */}
                             <div style={{

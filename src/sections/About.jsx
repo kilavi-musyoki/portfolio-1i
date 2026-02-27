@@ -245,24 +245,26 @@ const About = ({ isDark }) => {
                                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: dimColor, letterSpacing: '0.1em', marginBottom: '12px' }}>
                                     // ABSOLUTE MAXIMUM RATINGS (soft skills)
                                 </div>
-                                <table className="datasheet-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Parameter</th>
-                                            <th>Value</th>
-                                            <th>Unit</th>
-                                            <th>Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td>Problem-solving endurance</td><td style={{ color: '#FF3D00' }}>MAX</td><td>hrs</td><td>Tested under final exam conditions</td></tr>
-                                        <tr><td>Cross-domain curiosity</td><td style={{ color: '#FF3D00' }}>UNBOUNDED</td><td>—</td><td>RF → web → DB → firmware → repeat</td></tr>
-                                        <tr><td>Communication clarity</td><td style={{ color: '#D4A843' }}>HIGH</td><td>—</td><td>3 languages: EN, SW, Mandarin (learning)</td></tr>
-                                        <tr><td>Team collaboration</td><td style={{ color: '#4BD8A0' }}>RATED</td><td>—</td><td>Class Rep, IEEE member</td></tr>
-                                        <tr><td>Deadline compliance</td><td style={{ color: '#D4A843' }}>HIGH</td><td>%</td><td>Nominal under typical conditions</td></tr>
-                                        <tr><td>Self-directed learning rate</td><td style={{ color: '#FF3D00' }}>FAST</td><td>kB/s</td><td>New domains absorbed in days, not weeks</td></tr>
-                                    </tbody>
-                                </table>
+                                <div style={{ width: '100%', overflowX: 'auto' }}>
+                                    <table className="datasheet-table" style={{ minWidth: '480px' }}>
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Value</th>
+                                                <th>Unit</th>
+                                                <th>Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Problem-solving endurance</td><td style={{ color: '#FF3D00' }}>MAX</td><td>hrs</td><td>Tested under final exam conditions</td></tr>
+                                            <tr><td>Cross-domain curiosity</td><td style={{ color: '#FF3D00' }}>UNBOUNDED</td><td>—</td><td>RF → web → DB → firmware → repeat</td></tr>
+                                            <tr><td>Communication clarity</td><td style={{ color: '#D4A843' }}>HIGH</td><td>—</td><td>3 languages: EN, SW, Mandarin (learning)</td></tr>
+                                            <tr><td>Team collaboration</td><td style={{ color: '#4BD8A0' }}>RATED</td><td>—</td><td>Class Rep, IEEE member</td></tr>
+                                            <tr><td>Deadline compliance</td><td style={{ color: '#D4A843' }}>HIGH</td><td>%</td><td>Nominal under typical conditions</td></tr>
+                                            <tr><td>Self-directed learning rate</td><td style={{ color: '#FF3D00' }}>FAST</td><td>kB/s</td><td>New domains absorbed in days, not weeks</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </motion.div>
                         )}
                     </div>

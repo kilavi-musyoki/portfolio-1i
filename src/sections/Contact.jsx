@@ -28,10 +28,10 @@ const Contact = ({ isDark }) => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
     const contactProvider = (import.meta.env.VITE_CONTACT_PROVIDER || 'api').toLowerCase(); // "api" | "emailjs"
 
-    const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-    const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
-    const accentColor = isDark ? '#00FF88' : '#D4A843';
-    const borderColor = isDark ? 'rgba(0,255,136,0.2)' : 'rgba(212,168,67,0.25)';
+    const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
+    const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
+    const accentColor = isDark ? '#4BD8A0' : '#D4A843';
+    const borderColor = isDark ? 'rgba(75,216,160,0.22)' : 'rgba(212,168,67,0.25)';
 
     // Animate oscilloscope
     useEffect(() => {
@@ -248,7 +248,7 @@ const Contact = ({ isDark }) => {
                                 {status === 'sent' ? (
                                     // Flatline then burst
                                     <>
-                                        <line x1="0" y1="50" x2="480" y2="50" stroke="#00FF88" strokeWidth="1.5" opacity="0.6" />
+                                        <line x1="0" y1="50" x2="480" y2="50" stroke={accentColor} strokeWidth="1.5" opacity="0.6" />
                                         <motion.circle cx="240" cy="50" r="0" fill="rgba(0,255,136,0.3)"
                                             animate={{ r: [0, 80, 0] }}
                                             transition={{ duration: 1.5, ease: 'easeOut' }}
@@ -272,7 +272,7 @@ const Contact = ({ isDark }) => {
 
                         {/* Status messages */}
                         {status === 'sent' && (
-                            <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: '#00FF88', textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}>
+                            <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: accentColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}>
                                 ✓ SIGNAL TRANSMITTED. AWAITING RESPONSE...
                             </div>
                         )}
@@ -337,7 +337,7 @@ const Contact = ({ isDark }) => {
                                     name="subject"
                                     value={formData.subject}
                                     onChange={handleInput}
-                                    placeholder="Industrial attachment inquiry"
+                                    placeholder="what do u wanna do?"
                                 />
                             </div>
 

@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
  * PCBBoard — 7-layer deconstructable ESP32 PCB SVG
  * Layers: casing → thermal → bare-pcb → traces → components → die → quantum
  */
-const PCBBoard = ({ layer = 'casing', className = '' }) => {
+const PCBBoard = ({ layer = 'casing', className = '', isDark = true }) => {
     const [tooltip, setTooltip] = useState(null);
     const tooltipTimer = useRef(null);
 
@@ -57,13 +57,13 @@ const PCBBoard = ({ layer = 'casing', className = '' }) => {
             >
                 <defs>
                     <radialGradient id="board-glow" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#00FF88" stopOpacity="0.15" />
-                        <stop offset="100%" stopColor="#00FF88" stopOpacity="0" />
+                        <stop offset="0%" stopColor={isDark ? '#4BD8A0' : '#D4A843'} stopOpacity="0.15" />
+                        <stop offset="100%" stopColor={isDark ? '#4BD8A0' : '#D4A843'} stopOpacity="0" />
                     </radialGradient>
                     <radialGradient id="quantum-glow" cx="50%" cy="50%" r="60%">
-                        <stop offset="0%" stopColor="#4DFFFF" stopOpacity="0.3" />
-                        <stop offset="50%" stopColor="#00FF88" stopOpacity="0.15" />
-                        <stop offset="100%" stopColor="#FF3D00" stopOpacity="0" />
+                        <stop offset="0%" stopColor={isDark ? '#6FD4FF' : '#D4A843'} stopOpacity="0.3" />
+                        <stop offset="50%" stopColor={isDark ? '#4BD8A0' : '#E3C08A'} stopOpacity="0.18" />
+                        <stop offset="100%" stopColor={isDark ? '#FF5A3C' : '#C28A3A'} stopOpacity="0" />
                     </radialGradient>
                     <filter id="pcb-glow">
                         <feGaussianBlur stdDeviation="1.5" result="blur" />
@@ -94,11 +94,30 @@ const PCBBoard = ({ layer = 'casing', className = '' }) => {
                     </radialGradient>
                 </defs>
 
-                {/* ======= LAYER: CASING ======= */}
+                {/* ======= LAYER: CASING (avatar case) ======= */}
                 <g opacity={vis.casing} style={{ transition: 'opacity 0.8s ease' }}>
-                    {/* Aluminium casing body */}
-                    <rect x="2" y="2" width="196" height="156" rx="6" fill="#2a2a2a" stroke="#444" strokeWidth="1" />
-                    <rect x="8" y="8" width="184" height="144" rx="4" fill="#222" stroke="#333" strokeWidth="0.5" />
+                    {/* Outer casing body */}
+                    <rect
+                        x="2"
+                        y="2"
+                        width="196"
+                        height="156"
+                        rx="6"
+                        fill={isDark ? '#2a2a2a' : '#E5D2B5'}
+                        stroke={isDark ? '#444' : '#C7A979'}
+                        strokeWidth="1"
+                    />
+                    {/* Inner bezel / faceplate */}
+                    <rect
+                        x="8"
+                        y="8"
+                        width="184"
+                        height="144"
+                        rx="4"
+                        fill={isDark ? '#222' : '#F6ECDE'}
+                        stroke={isDark ? '#333' : '#D9BE8F'}
+                        strokeWidth="0.5"
+                    />
                     {/* Brushed metal texture lines */}
                     {[...Array(14)].map((_, i) => (
                         <line key={i} x1="8" y1={14 + i * 10} x2="192" y2={14 + i * 10} stroke="#2f2f2f" strokeWidth="0.3" />
@@ -135,10 +154,20 @@ const PCBBoard = ({ layer = 'casing', className = '' }) => {
                     <circle cx="114" cy="84" r="12" fill="rgba(255,120,0,0.2)" />
                 </g>
 
-                {/* ======= LAYER: PCB BASE ======= */}
+                {/* ======= LAYER: PCB BASE / Oscillator panel ======= */}
                 <g opacity={vis.pcb} style={{ transition: 'opacity 0.8s ease' }}>
-                    {/* PCB FR4 substrate */}
-                    <rect x="4" y="4" width="192" height="152" rx="5" fill="#1a2e1a" stroke="#00FF88" strokeWidth="0.5" strokeOpacity="0.4" />
+                    {/* PCB / panel substrate */}
+                    <rect
+                        x="4"
+                        y="4"
+                        width="192"
+                        height="152"
+                        rx="5"
+                        fill={isDark ? '#1a2e1a' : '#F2DFC4'}
+                        stroke={isDark ? '#4BD8A0' : '#C79A4D'}
+                        strokeWidth="0.5"
+                        strokeOpacity="0.4"
+                    />
                     {/* Mounting holes */}
                     {[[14, 14], [186, 14], [14, 146], [186, 146]].map(([cx, cy], i) => (
                         <g key={i}>
