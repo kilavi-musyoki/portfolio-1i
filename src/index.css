@@ -5,10 +5,10 @@
 
 /* ===== CSS Variables ===== */
 :root {
-  --base: #0A0A0F;
-  --pcb-green: #00FF88;
-  --cap-cyan: #4DFFFF;
-  --alert-red: #FF3D00;
+  --base: #05060d;
+  --pcb-green: #4BD8A0;
+  --cap-cyan: #6FD4FF;
+  --alert-red: #FF5A3C;
   --solder-gold: #D4A843;
   --pcb-beige: #F5F0E8;
   --deep-navy: #1A1A2E;
@@ -84,7 +84,7 @@ body.light-mode::after {
   background: #0A0A0F;
 }
 ::-webkit-scrollbar-thumb {
-  background: #00FF88;
+  background: var(--pcb-green);
   border-radius: 2px;
 }
 
@@ -97,8 +97,8 @@ body.light-mode ::-webkit-scrollbar-thumb {
 
 /* ===== Selection ===== */
 ::selection {
-  background: rgba(0, 255, 136, 0.3);
-  color: #00FF88;
+  background: rgba(75, 216, 160, 0.25);
+  color: var(--pcb-green);
 }
 
 /* ===== Reduced Motion ===== */
@@ -133,9 +133,9 @@ body.light-mode ::-webkit-scrollbar-thumb {
 /* ===== Bootloader Terminal ===== */
 .boot-terminal {
   font-family: var(--font-mono);
-  background: rgba(0, 0, 0, 0.95);
-  border: 1px solid rgba(0, 255, 136, 0.3);
-  box-shadow: 0 0 40px rgba(0, 255, 136, 0.15), inset 0 0 40px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.96);
+  border: 1px solid rgba(75, 216, 160, 0.32);
+  box-shadow: 0 0 40px rgba(75, 216, 160, 0.18), inset 0 0 40px rgba(0, 0, 0, 0.55);
 }
 
 .boot-line {
@@ -171,8 +171,8 @@ body.light-mode ::-webkit-scrollbar-thumb {
 
 /* ===== PCB Module Card ===== */
 .pcb-card {
-  background: rgba(0, 255, 136, 0.03);
-  border: 1px solid rgba(0, 255, 136, 0.2);
+  background: rgba(75, 216, 160, 0.03);
+  border: 1px solid rgba(75, 216, 160, 0.22);
   border-radius: 4px;
   position: relative;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -286,7 +286,7 @@ body.light-mode .pcb-card:hover {
   pointer-events: none;
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #00FF88;
+  color: var(--pcb-green);
   padding: 1rem;
 }
 
@@ -357,22 +357,22 @@ body.light-mode .hud-input::placeholder {
 /* ===== Tooltip ===== */
 .pcb-tooltip {
   position: absolute;
-  background: rgba(0, 5, 15, 0.95);
-  border: 1px solid rgba(0, 255, 136, 0.4);
+  background: rgba(0, 5, 15, 0.96);
+  border: 1px solid rgba(75, 216, 160, 0.4);
   border-radius: 3px;
   padding: 0.5rem 0.75rem;
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  color: #00FF88;
+  color: var(--pcb-green);
   pointer-events: none;
   z-index: 1000;
   white-space: nowrap;
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 12px rgba(75, 216, 160, 0.24);
 }
 
 /* ===== Light mode accents ===== */
 body.light-mode {
-  --pcb-green: #00b360;
+  --pcb-green: #20a574;
   --cap-cyan: #0099cc;
 }
 
@@ -394,10 +394,10 @@ body.light-mode .changelog-entry {
 
 /* ===== Nav Glass ===== */
 .nav-glass {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(10, 10, 15, 0.8);
-  border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(6, 8, 14, 0.9);
+  border-bottom: 1px solid rgba(75, 216, 160, 0.16);
 }
 body.light-mode .nav-glass {
   background: rgba(245, 240, 232, 0.85);
@@ -423,18 +423,18 @@ body.light-mode .nav-glass {
   font-size: 0.75rem;
 }
 .datasheet-table th {
-  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+  border-bottom: 1px solid rgba(75, 216, 160, 0.3);
   padding: 0.5rem 0.75rem;
   text-align: left;
-  color: rgba(0, 255, 136, 0.7);
+  color: rgba(75, 216, 160, 0.72);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .datasheet-table td {
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(0, 255, 136, 0.08);
-  color: #b0ffcc;
+  border-bottom: 1px solid rgba(75, 216, 160, 0.08);
+  color: #c0f3de;
 }
 .datasheet-table tr:last-child td { border-bottom: none; }
 
@@ -482,5 +482,10 @@ body.light-mode .datasheet-table td {
 
   .oscilloscope-container {
     height: 80px;
+  }
+
+  /* Hide full nav link cluster on small phones so logo/title stay visible */
+  .nav-links {
+    display: none !important;
   }
 }

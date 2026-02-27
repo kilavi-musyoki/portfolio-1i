@@ -48,25 +48,25 @@ const SKILLS = [
 ];
 
 const getBarGradient = (level) => {
-    if (level >= 88) return 'linear-gradient(90deg, #FF3D00, #FF8C00)'; // hot — strongest
+    if (level >= 88) return 'linear-gradient(90deg, #FF5A3C, #FF8C00)'; // hot — strongest
     if (level >= 78) return 'linear-gradient(90deg, #FF8C00, #D4A843)'; // warm
-    if (level >= 70) return 'linear-gradient(90deg, #D4A843, #00FF88)'; // mid
-    return 'linear-gradient(90deg, #00FF88, #4DFFFF)';                    // cool
+    if (level >= 70) return 'linear-gradient(90deg, #D4A843, #4BD8A0)'; // mid
+    return 'linear-gradient(90deg, #4BD8A0, #6FD4FF)';                  // cool
 };
 
 const About = ({ isDark }) => {
     const [activeTab, setActiveTab] = useState('description');
-    const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-    const accentColor = isDark ? '#00FF88' : '#D4A843';
-    const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
-    const borderColor = isDark ? 'rgba(0,255,136,0.2)' : 'rgba(212,168,67,0.25)';
-    const bgCard = isDark ? 'rgba(0,255,136,0.03)' : 'rgba(212,168,67,0.04)';
+    const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
+    const accentColor = isDark ? '#4BD8A0' : '#D4A843';
+    const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
+    const borderColor = isDark ? 'rgba(75,216,160,0.22)' : 'rgba(212,168,67,0.25)';
+    const bgCard = isDark ? 'rgba(6,10,12,0.85)' : 'rgba(212,168,67,0.04)';
 
     return (
         <section
             id="about"
             className="section-base"
-            style={{ background: isDark ? 'rgba(0,10,5,0.6)' : 'rgba(255,253,247,0.6)' }}
+            style={{ background: isDark ? 'rgba(3,6,10,0.9)' : 'rgba(255,253,247,0.7)' }}
             data-debug="about-section"
         >
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -155,7 +155,7 @@ const About = ({ isDark }) => {
                         {activeTab === 'description' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: dimColor, letterSpacing: '0.1em', marginBottom: '12px' }}>
-                  // DESCRIPTION
+                                    // DESCRIPTION
                                 </div>
                                 <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.85rem', color: textColor, lineHeight: 1.8, marginBottom: '2rem' }}>
                                     I'm a Telecommunications and Information Engineering student at Dedan Kimathi University
@@ -166,7 +166,7 @@ const About = ({ isDark }) => {
                                 </p>
 
                                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: dimColor, letterSpacing: '0.1em', marginBottom: '12px' }}>
-                  // KEY FEATURES
+                                    // KEY FEATURES
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
                                     {SKILLS.map((group) => (
@@ -175,11 +175,11 @@ const About = ({ isDark }) => {
                                                 {group.category.toUpperCase()}
                                             </div>
                                             {group.items.map((skill) => (
-                                                <div key={skill.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: textColor, minWidth: '140px' }}>
+                                                <div key={skill.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: textColor, minWidth: '140px', maxWidth: '100%' }}>
                                                         {skill.name}
                                                     </span>
-                                                    <div className="skill-bar" style={{ flex: 1, height: '4px', background: isDark ? 'rgba(0,255,136,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                    <div className="skill-bar" style={{ flex: 1, minWidth: '140px', height: '4px', background: isDark ? 'rgba(75,216,160,0.12)' : 'rgba(0,0,0,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
                                                         <motion.div
                                                             initial={{ width: 0 }}
                                                             whileInView={{ width: `${skill.level}%` }}
@@ -200,35 +200,35 @@ const About = ({ isDark }) => {
                         {activeTab === 'specifications' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: dimColor, letterSpacing: '0.1em', marginBottom: '12px' }}>
-                  // ELECTRICAL CHARACTERISTICS — PROFICIENCY HEATMAP
+                                    // ELECTRICAL CHARACTERISTICS — PROFICIENCY HEATMAP
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
                                     {SKILLS.flatMap(g => g.items).map((skill) => (
-                                        <div key={skill.name} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: textColor, width: '200px', flexShrink: 0 }}>
+                                        <div key={skill.name} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: textColor, minWidth: '160px', maxWidth: '100%', flexShrink: 0 }}>
                                                 {skill.name}
                                             </span>
-                                            <div style={{ flex: 1, height: '8px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <div style={{ flex: 1, minWidth: '160px', height: '8px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     whileInView={{ width: `${skill.level}%` }}
                                                     viewport={{ once: true }}
                                                     transition={{ duration: 1.2, delay: 0.1 }}
-                                                    style={{ height: '100%', background: getBarGradient(skill.level), borderRadius: '4px', boxShadow: `0 0 8px ${skill.level >= 88 ? '#FF3D0060' : '#00FF8840'}` }}
+                                                    style={{ height: '100%', background: getBarGradient(skill.level), borderRadius: '4px', boxShadow: `0 0 8px ${skill.level >= 88 ? '#FF5A3C60' : '#4BD8A040'}` }}
                                                 />
                                             </div>
-                                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: accentColor, width: '35px', textAlign: 'right' }}>
+                                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: accentColor, width: '40px', textAlign: 'right' }}>
                                                 {skill.level}%
                                             </span>
                                         </div>
                                     ))}
                                 </div>
                                 <div style={{ marginTop: '16px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                                    {[
-                                        { color: '#FF3D00', label: '88–100% — Expert (Hot)' },
+                                        {[
+                                        { color: '#FF5A3C', label: '88–100% — Expert (Hot)' },
                                         { color: '#D4A843', label: '78–87% — Advanced (Warm)' },
-                                        { color: '#00FF88', label: '70–77% — Proficient (Green)' },
-                                        { color: '#4DFFFF', label: '<70% — Learning (Cool)' },
+                                        { color: '#4BD8A0', label: '70–77% — Proficient (Green)' },
+                                        { color: '#6FD4FF', label: '<70% — Learning (Cool)' },
                                     ].map((l) => (
                                         <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                             <div style={{ width: '12px', height: '4px', background: l.color, borderRadius: '2px' }} />
@@ -243,7 +243,7 @@ const About = ({ isDark }) => {
                         {activeTab === 'ratings' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: dimColor, letterSpacing: '0.1em', marginBottom: '12px' }}>
-                  // ABSOLUTE MAXIMUM RATINGS (soft skills)
+                                    // ABSOLUTE MAXIMUM RATINGS (soft skills)
                                 </div>
                                 <table className="datasheet-table">
                                     <thead>
@@ -258,7 +258,7 @@ const About = ({ isDark }) => {
                                         <tr><td>Problem-solving endurance</td><td style={{ color: '#FF3D00' }}>MAX</td><td>hrs</td><td>Tested under final exam conditions</td></tr>
                                         <tr><td>Cross-domain curiosity</td><td style={{ color: '#FF3D00' }}>UNBOUNDED</td><td>—</td><td>RF → web → DB → firmware → repeat</td></tr>
                                         <tr><td>Communication clarity</td><td style={{ color: '#D4A843' }}>HIGH</td><td>—</td><td>3 languages: EN, SW, Mandarin (learning)</td></tr>
-                                        <tr><td>Team collaboration</td><td style={{ color: '#00FF88' }}>RATED</td><td>—</td><td>Class Rep, IEEE member</td></tr>
+                                        <tr><td>Team collaboration</td><td style={{ color: '#4BD8A0' }}>RATED</td><td>—</td><td>Class Rep, IEEE member</td></tr>
                                         <tr><td>Deadline compliance</td><td style={{ color: '#D4A843' }}>HIGH</td><td>%</td><td>Nominal under typical conditions</td></tr>
                                         <tr><td>Self-directed learning rate</td><td style={{ color: '#FF3D00' }}>FAST</td><td>kB/s</td><td>New domains absorbed in days, not weeks</td></tr>
                                     </tbody>

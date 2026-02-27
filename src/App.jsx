@@ -10,7 +10,7 @@ import { initScroll } from './scrollSetup.js';
 
 // Spark particle effect on click
 const createSparks = (x, y, isDark) => {
-  const color = isDark ? '#D4A843' : '#00FF88';
+  const color = isDark ? '#D4A843' : '#4BD8A0';
   for (let i = 0; i < 10; i++) {
     const spark = document.createElement('div');
     spark.className = 'spark';
@@ -169,9 +169,9 @@ function App() {
     return () => window.removeEventListener('click', handleClick);
   }, [isDark]);
 
-  const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-  const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
-  const accentColor = isDark ? '#00FF88' : '#D4A843';
+  const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
+  const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
+  const accentColor = isDark ? '#4BD8A0' : '#D4A843';
 
   return (
     <>
@@ -201,13 +201,14 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
+          whiteSpace: 'nowrap',
         }}>
           <div style={{ width: 8, height: 8, background: accentColor, borderRadius: '50%', boxShadow: `0 0 8px ${accentColor}` }} />
           KM — SILICON SOUL
         </a>
 
         {/* Links */}
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+        <div className="nav-links" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -233,10 +234,10 @@ function App() {
             alignItems: 'center',
             gap: '6px',
             padding: '4px 10px',
-            border: `1px solid rgba(0,255,136,0.2)`,
+            border: `1px solid rgba(75,216,160,0.25)`,
             borderRadius: '2px',
           }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#00FF88', boxShadow: '0 0 6px #00FF88', animation: 'blink-slow 2s ease-in-out infinite' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#4BD8A0', boxShadow: '0 0 6px #4BD8A0', animation: 'blink-slow 2s ease-in-out infinite' }} />
             <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.55rem', color: dimColor, letterSpacing: '0.08em' }}>
               {`SYSTEM: ONLINE | SEEKING: ${status.seeking?.toUpperCase() || 'N/A'} | UNTIL: ${status.until || '—'}`}
             </span>
@@ -260,7 +261,7 @@ function App() {
       </nav>
 
       {/* Main sections */}
-      <main>
+      <main style={{ paddingTop: '56px' }}>
         <Hero isDark={isDark} layer={boardLayer} glitch={boardGlitch} />
         <About isDark={isDark} />
         <Projects isDark={isDark} />
