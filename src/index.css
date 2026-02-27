@@ -524,3 +524,14 @@ body.light-mode .datasheet-table td {
     display: none !important;
   }
 }
+
+body.light-mode .oscilloscope-container {
+  background: #eef2fa;
+  border-color: rgba(80, 177, 206, 0.45);
+}
+
+body.light-mode .oscilloscope-grid {
+  background-image:
+    linear-gradient(rgba(80, 177, 206, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80, 177, 206, 0.07) 1px, transparent 1px);
+}
