@@ -11,7 +11,7 @@
   --cap-cyan: #9ca09c;      /* secondary accent */
   --alert-red: #FF5A3C;
   --solder-gold: #ced0ce;   /* soft highlight */
-  --pcb-beige: #F5F0E8;     /* light-mode background */
+  --pcb-beige: #f6f7fb;    /* light-mode background */
   --deep-navy: #1A1A2E;
   --backlit-white: #ffffff; /* brightest text / highlights */
   --font-mono: 'JetBrains Mono', monospace;
@@ -41,8 +41,8 @@ body {
 
 /* Light mode body */
 body.light-mode {
-  background: var(--pcb-beige);
-  color: var(--deep-navy);
+  background:#f6f7fb;
+  color:#2A2A3A;
 }
 
 /* ===== Noise Texture Overlay ===== */
@@ -93,7 +93,7 @@ body.light-mode ::-webkit-scrollbar-track {
   background: var(--pcb-beige);
 }
 body.light-mode ::-webkit-scrollbar-thumb {
-  background: var(--solder-gold, #D4A843);
+  background:#9eb0d2;
 }
 
 /* ===== Selection ===== */
@@ -184,14 +184,20 @@ body.light-mode ::-webkit-scrollbar-thumb {
 }
 
 body.light-mode .pcb-card {
-  background: rgba(212, 168, 67, 0.05);
-  border-color: rgba(212, 168, 67, 0.3);
-}
-body.light-mode .pcb-card:hover {
-  border-color: rgba(212, 168, 67, 0.7);
-  box-shadow: 0 0 20px rgba(212, 168, 67, 0.15);
+
+  background: rgba(208,206,225,0.35);
+
+  border-color: rgba(158,176,210,0.6);
+
 }
 
+body.light-mode .pcb-card:hover {
+
+  border-color:#50b1ce;
+
+  box-shadow:0 0 16px rgba(80,177,206,0.25);
+
+}
 /* ===== Skill Bar ===== */
 .skill-bar {
   height: 6px;
@@ -343,13 +349,21 @@ body.light-mode .pcb-card:hover {
 }
 
 body.light-mode .hud-input {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(212, 168, 67, 0.3);
-  color: var(--deep-navy);
+
+  background:#ffffff;
+
+  border-color:#9eb0d2;
+
+  color:#2A2A3A;
+
 }
+
 body.light-mode .hud-input:focus {
-  border-color: rgba(212, 168, 67, 0.7);
-  box-shadow: 0 0 10px rgba(212, 168, 67, 0.1);
+
+  border-color:#50b1ce;
+
+  box-shadow:0 0 10px rgba(80,177,206,0.2);
+
 }
 body.light-mode .hud-input::placeholder {
   color: rgba(26, 26, 46, 0.4);
@@ -373,16 +387,25 @@ body.light-mode .hud-input::placeholder {
 
 /* ===== Light mode accents ===== */
 body.light-mode {
-  --pcb-green: #20a574;
-  --cap-cyan: #0099cc;
+
+  /* Primary accent */
+  --pcb-green: #50b1ce;
+
+  /* Secondary accent */
+  --cap-cyan: #79bfc9;
+
 }
 
 body.light-mode .changelog-entry::before {
-  background: var(--solder-gold, #D4A843);
-  box-shadow: 0 0 8px var(--solder-gold, #D4A843);
+
+  background:#50b1ce;
+
+  box-shadow:0 0 6px #50b1ce;
+
 }
+
 body.light-mode .changelog-entry {
-  border-left-color: rgba(212, 168, 67, 0.4);
+  border-left-color: rgba(80, 177, 206, 0.4);
 }
 
 /* ===== Status bar ===== */
@@ -401,8 +424,11 @@ body.light-mode .changelog-entry {
   border-bottom: 1px solid rgba(107, 113, 107, 0.6);
 }
 body.light-mode .nav-glass {
-  background: rgba(245, 240, 232, 0.85);
-  border-bottom-color: rgba(212, 168, 67, 0.2);
+
+  background:rgba(255,255,255,0.8);
+
+  border-bottom-color:#9eb0d2;
+
 }
 
 /* ===== Spark Particle ===== */
@@ -411,7 +437,7 @@ body.light-mode .nav-glass {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #D4A843;
+  background:#79bfc9;
   pointer-events: none;
   z-index: 99997;
 }
@@ -442,12 +468,18 @@ body.light-mode .nav-glass {
 .datasheet-table tr:last-child td { border-bottom: none; }
 
 body.light-mode .datasheet-table th {
-  border-bottom-color: rgba(212, 168, 67, 0.4);
-  color: rgba(26, 26, 46, 0.6);
+
+  border-bottom-color:#9eb0d2;
+
+  color:#6b7a99;
+
 }
 body.light-mode .datasheet-table td {
-  border-bottom-color: rgba(212, 168, 67, 0.1);
-  color: var(--deep-navy);
+
+  border-bottom-color:#d0cee1;
+
+  color:#2A2A3A;
+
 }
 
 /* ===== Responsive Layouts ===== */
