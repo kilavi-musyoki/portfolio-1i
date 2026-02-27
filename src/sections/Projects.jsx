@@ -12,7 +12,7 @@ const PROJECTS = [
         outcome: 'Sub-100ms result propagation to all connected clients. Zero server costs at scale. Double-voting prevented at database rule level, independent of client logic.',
         lessons: 'Firestore security rules are Turing-complete but tricky — early iterations had a race condition during simultaneous votes requiring transactional write pattern. Client-side validation is never a substitute for server-side rule enforcement.',
         stack: ['React', 'Firebase Auth', 'Cloud Firestore', 'Firebase Hosting', 'Tailwind CSS'],
-        color: '#00FF88',
+        color: '#ffffff',
         icon: '🗳️',
     },
     {
@@ -25,7 +25,7 @@ const PROJECTS = [
         outcome: 'Average alert latency under 1.5 seconds from sensor threshold breach to admin notification. Validated across 4 independent zones with 100% detection rate during controlled smoke tests.',
         lessons: 'Wi-Fi reconnection on ESP32 requires a carefully tuned watchdog — naive reconnect loops stall the sensor-read task entirely. FreeRTOS separate tasks eliminated all lockups. MQ-2 sensor warm-up delays are critical for accuracy.',
         stack: ['ESP32 (C++)', 'FreeRTOS', 'MQ-2 / DHT22', 'MQTT / Mosquitto', 'Node-RED', 'Telegram Bot API'],
-        color: '#FF3D00',
+        color: '#ced0ce',
         icon: '🔥',
     },
     {
@@ -38,7 +38,7 @@ const PROJECTS = [
         outcome: 'Verified functional correctness across all 1,440 daily minute-states. All edge cases handled without glitching or invalid BCD output.',
         lessons: 'Midnight/noon conversions require separate comparator branches — one threshold comparator can\'t differentiate both. BCD addition overflow must be corrected explicitly; binary adders produce values above 9 without a correction stage.',
         stack: ['Logisim Evolution', 'BCD Logic', 'Combinational Circuits', 'Flip-Flops', 'Comparators', 'MUX/DEMUX'],
-        color: '#4DFFFF',
+        color: '#9ca09c',
         icon: '🕐',
     },
     {
@@ -51,7 +51,7 @@ const PROJECTS = [
         outcome: 'Full hardware-software integration across 5 sensor types and 3 actuator subsystems. Sub-200ms response to motion and light changes. Presented as final hardware project to engineering faculty.',
         lessons: 'Polling all sensors in a tight loop introduced 400ms lag. Restructuring into interrupt-driven reads with cooperative scheduler reduced latency to under 200ms and eliminated missed sensor events.',
         stack: ['AVR Microcontroller (C)', 'PIR Sensor', 'LDR', 'DHT22', 'DS3231 RTC', '16×2 LCD', 'Servo', 'Relay'],
-        color: '#D4A843',
+        color: '#6b716b',
         icon: '🏠',
     },
     {
@@ -64,14 +64,14 @@ const PROJECTS = [
         outcome: '<0.3 dB insertion loss deviation between simulation and theoretical model at 5 GHz. Substrate loss tangent identified as dominant error contributor above 6 GHz; RO4003C outperforms FR-4 by 0.9 dB at 10 GHz.',
         lessons: 'Mesh density in Momentum has non-linear accuracy impact. Too coarse at high frequencies introduces ~1.2 dB error; too fine makes solve time impractical. Frequency-adaptive mesh at 20 cells/wavelength struck the right balance.',
         stack: ['Keysight ADS', 'Momentum EM Solver', 'LineCalc', 'MATLAB', 'S-parameter Analysis'],
-        color: '#8A6CD4',
+        color: '#394139',
         icon: '📡',
     },
 ];
 
 const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
-    const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-    const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
+    const textColor = isDark ? '#ced0ce' : '#1A1A2E';
+    const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
     const borderColor = isDark ? `${project.color}33` : `${project.color}44`;
     const bgCard = isDark ? `${project.color}08` : `${project.color}06`;
 
@@ -103,7 +103,7 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                 gap: '16px',
             }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: 1 }}>
-                    {/* Module slot visual */}
+                    {/* Module icon */}
                     <div style={{
                         width: '48px', height: '48px', flexShrink: 0,
                         border: `1px solid ${project.color}55`,
@@ -140,7 +140,7 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                 </motion.div>
             </div>
 
-            {/* Expanded content */}
+                    {/* Expanded content (shortened copy) */}
             <AnimatePresence>
                 {isExpanded && (
                     <motion.div
@@ -152,28 +152,29 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div style={{
-                            padding: '0 24px 24px',
+                            padding: '0 24px 20px',
                             borderTop: `1px solid ${project.color}22`,
-                            paddingTop: '20px',
+                            paddingTop: '16px',
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                            gap: '20px',
+                            gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)',
+                            gap: '16px',
                         }}>
-                            {[
-                                { label: '// PROBLEM STATEMENT', content: project.problem },
-                                { label: '// TECHNICAL APPROACH', content: project.approach },
-                                { label: '// OUTCOME', content: project.outcome },
-                                { label: '// LESSONS LEARNED', content: project.lessons },
-                            ].map((section) => (
-                                <div key={section.label}>
-                                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '8px' }}>
-                                        {section.label}
-                                    </div>
-                                    <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: isDark ? '#b0ffcc' : '#2a2a4a', lineHeight: 1.75 }}>
-                                        {section.content}
-                                    </p>
+                            <div>
+                                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '6px' }}>
+                                    // OVERVIEW
                                 </div>
-                            ))}
+                                <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: textColor, lineHeight: 1.7 }}>
+                                    {project.problem}
+                                </p>
+                            </div>
+                            <div>
+                                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '6px' }}>
+                                    // RESULT
+                                </div>
+                                <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: dimColor, lineHeight: 1.7 }}>
+                                    {project.outcome}
+                                </p>
+                            </div>
                         </div>
 
                         {/* Stack tags */}
@@ -208,8 +209,8 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
 
 const Projects = ({ isDark }) => {
     const [expandedId, setExpandedId] = useState(null);
-    const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-    const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
+    const textColor = isDark ? '#ced0ce' : '#1A1A2E';
+    const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
 
     return (
         <section id="projects" className="section-base" data-debug="projects-section">

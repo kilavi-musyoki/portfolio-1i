@@ -3,53 +3,39 @@ import { motion } from 'framer-motion';
 
 const CHANGELOG = [
     {
-        version: 'v4.0.0',
-        status: 'PURSUING',
-        title: 'BSc Telecommunications & Information Engineering',
-        body: 'DeKUT, Nyeri, Kenya. One of Kenya\'s leading STEM institutions. 2023–2027',
-        color: '#00FF88',
+        version: 'v4.0',
+        status: 'Degree',
+        title: 'Telecommunications & Information Engineering, DeKUT',
+        body: 'BSc programme focused on communications systems, networking, and electronics. 2023–2027.',
+        color: '#ffffff',
     },
     {
-        version: 'v3.2.0',
-        status: 'LEADERSHIP',
+        version: 'v3.0',
+        status: 'Leadership',
         title: 'Class Representative',
-        body: 'Elected class rep — bridging students and faculty, organising academic activities. Ongoing',
-        color: '#4DFFFF',
+        body: 'Elected liaison between students and faculty, coordinating academic communication and schedules.',
+        color: '#ced0ce',
     },
     {
-        version: 'v3.1.0',
-        status: 'MEMBERSHIP',
+        version: 'v2.0',
+        status: 'Community',
         title: 'IEEE Student Branch, DeKUT',
-        body: 'Engaging with global engineering standards, workshops, and professional development. Ongoing',
-        color: '#4DFFFF',
+        body: 'Active member — talks, workshops, and standards-focused events around real engineering practice.',
+        color: '#9ca09c',
     },
     {
-        version: 'v2.5.0',
-        status: 'COMMS',
-        title: 'Trilingual Communicator',
-        body: 'Fluent: English, Kiswahili. Beginner: Mandarin. Cross-cultural engineering collaboration. Lifelong',
-        color: '#D4A843',
-    },
-    {
-        version: 'v2.0.0',
-        status: 'TOOLKIT',
-        title: 'Multi-Domain Technical Proficiency',
-        body: 'Simulation (Multisim, Proteus, LTspice, ADS), Networking (Packet Tracer), CAD (AutoCAD, Autodesk Inventor), Databases (MySQL, MongoDB, Oracle). Built over 2+ years.',
-        color: '#D4A843',
-    },
-    {
-        version: 'v1.0.0',
-        status: 'SHIPPED',
+        version: 'v1.0',
+        status: 'Highlight',
         title: 'Cloud-Connected IoT Pipeline',
-        body: 'Full IoT pipeline: ESP32 sensors → MQTT → Firebase backend → live web dashboard. 2024',
-        color: '#00FF88',
+        body: 'ESP32 sensors, MQTT, and web dashboard for live monitoring — my first end‑to‑end engineering pipeline.',
+        color: '#6b716b',
     },
 ];
 
 const Milestones = ({ isDark }) => {
     const [hoveredIdx, setHoveredIdx] = useState(null);
-    const textColor = isDark ? '#e0ffe8' : '#1A1A2E';
-    const dimColor = isDark ? 'rgba(0,255,136,0.5)' : 'rgba(26,26,46,0.5)';
+    const textColor = isDark ? '#ced0ce' : '#1A1A2E';
+    const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
 
     return (
         <section id="milestones" className="section-base" data-debug="milestones-section">
@@ -66,8 +52,8 @@ const Milestones = ({ isDark }) => {
                     <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(2rem, 4vw, 3.5rem)', color: textColor, marginBottom: '0.5rem' }}>
                         Wins &amp; Milestones
                     </h2>
-                    <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: dimColor, marginBottom: '3rem' }}>
-            // FIRMWARE CHANGELOG FORMAT — hover for signal trace
+                    <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: dimColor, marginBottom: '3rem', maxWidth: '520px' }}>
+                        A few milestones that describe where I am today — kept short and to the point.
                     </p>
                 </motion.div>
 

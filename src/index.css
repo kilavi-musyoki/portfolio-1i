@@ -5,14 +5,15 @@
 
 /* ===== CSS Variables ===== */
 :root {
-  --base: #05060d;
-  --pcb-green: #4BD8A0;
-  --cap-cyan: #6FD4FF;
+  /* Dark mode palette from template */
+  --base: #394139;          /* main background */
+  --pcb-green: #6b716b;     /* primary accent / borders */
+  --cap-cyan: #9ca09c;      /* secondary accent */
   --alert-red: #FF5A3C;
-  --solder-gold: #D4A843;
-  --pcb-beige: #F5F0E8;
+  --solder-gold: #ced0ce;   /* soft highlight */
+  --pcb-beige: #F5F0E8;     /* light-mode background */
   --deep-navy: #1A1A2E;
-  --backlit-white: #FFFDF7;
+  --backlit-white: #ffffff; /* brightest text / highlights */
   --font-mono: 'JetBrains Mono', monospace;
   --font-display: 'Syne', sans-serif;
 }
@@ -32,7 +33,7 @@ html {
 body {
   font-family: var(--font-mono);
   background: var(--base);
-  color: #e0ffe8;
+  color: var(--backlit-white);
   overflow-x: hidden;
   min-height: 100vh;
   transition: background 0.6s ease, color 0.6s ease;
@@ -133,9 +134,9 @@ body.light-mode ::-webkit-scrollbar-thumb {
 /* ===== Bootloader Terminal ===== */
 .boot-terminal {
   font-family: var(--font-mono);
-  background: rgba(0, 0, 0, 0.96);
-  border: 1px solid rgba(75, 216, 160, 0.32);
-  box-shadow: 0 0 40px rgba(75, 216, 160, 0.18), inset 0 0 40px rgba(0, 0, 0, 0.55);
+  background: rgba(31, 35, 31, 0.96);
+  border: 1px solid rgba(107, 113, 107, 0.6);
+  box-shadow: 0 0 40px rgba(107, 113, 107, 0.18), inset 0 0 40px rgba(0, 0, 0, 0.55);
 }
 
 .boot-line {
@@ -171,8 +172,8 @@ body.light-mode ::-webkit-scrollbar-thumb {
 
 /* ===== PCB Module Card ===== */
 .pcb-card {
-  background: rgba(75, 216, 160, 0.03);
-  border: 1px solid rgba(75, 216, 160, 0.22);
+  background: rgba(156, 160, 156, 0.05);
+  border: 1px solid rgba(107, 113, 107, 0.7);
   border-radius: 4px;
   position: relative;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -286,7 +287,7 @@ body.light-mode .pcb-card:hover {
   pointer-events: none;
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--pcb-green);
+  color: var(--backlit-white);
   padding: 1rem;
 }
 
@@ -358,12 +359,12 @@ body.light-mode .hud-input::placeholder {
 .pcb-tooltip {
   position: absolute;
   background: rgba(0, 5, 15, 0.96);
-  border: 1px solid rgba(75, 216, 160, 0.4);
+  border: 1px solid rgba(107, 113, 107, 0.7);
   border-radius: 3px;
   padding: 0.5rem 0.75rem;
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  color: var(--pcb-green);
+  color: var(--backlit-white);
   pointer-events: none;
   z-index: 1000;
   white-space: nowrap;
@@ -396,8 +397,8 @@ body.light-mode .changelog-entry {
 .nav-glass {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  background: rgba(6, 8, 14, 0.9);
-  border-bottom: 1px solid rgba(75, 216, 160, 0.16);
+  background: rgba(40, 46, 40, 0.94);
+  border-bottom: 1px solid rgba(107, 113, 107, 0.6);
 }
 body.light-mode .nav-glass {
   background: rgba(245, 240, 232, 0.85);

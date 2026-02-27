@@ -10,7 +10,7 @@ import { initScroll } from './scrollSetup.js';
 
 // Spark particle effect on click
 const createSparks = (x, y, isDark) => {
-  const color = isDark ? '#D4A843' : '#4BD8A0';
+  const color = isDark ? '#ced0ce' : '#6b716b';
   for (let i = 0; i < 10; i++) {
     const spark = document.createElement('div');
     spark.className = 'spark';
@@ -169,9 +169,9 @@ function App() {
     return () => window.removeEventListener('click', handleClick);
   }, [isDark]);
 
-  const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
-  const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
-  const accentColor = isDark ? '#4BD8A0' : '#D4A843';
+  const textColor = isDark ? '#ced0ce' : '#1A1A2E';
+  const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
+  const accentColor = isDark ? '#ffffff' : '#D4A843';
 
   return (
     <>
@@ -237,7 +237,7 @@ function App() {
             border: `1px solid rgba(75,216,160,0.25)`,
             borderRadius: '2px',
           }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#4BD8A0', boxShadow: '0 0 6px #4BD8A0', animation: 'blink-slow 2s ease-in-out infinite' }} />
+          <div style={{ width: 5, height: 5, borderRadius: '50%', background: accentColor, boxShadow: `0 0 6px ${accentColor}`, animation: 'blink-slow 2s ease-in-out infinite' }} />
             <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.55rem', color: dimColor, letterSpacing: '0.08em' }}>
               {`SYSTEM: ONLINE | SEEKING: ${status.seeking?.toUpperCase() || 'N/A'} | UNTIL: ${status.until || '—'}`}
             </span>
@@ -273,13 +273,13 @@ function App() {
       <footer style={{
         padding: '2rem',
         textAlign: 'center',
-        borderTop: `1px solid ${isDark ? 'rgba(0,255,136,0.1)' : 'rgba(212,168,67,0.15)'}`,
-        background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(245,240,232,0.5)',
+        borderTop: `1px solid ${isDark ? 'rgba(156,160,156,0.4)' : 'rgba(212,168,67,0.15)'}`,
+        background: isDark ? 'rgba(41,47,41,0.9)' : 'rgba(245,240,232,0.5)',
       }}>
         <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: dimColor, marginBottom: '4px' }}>
           © 2026 Kilavi Musyoki — SN-2024-KM-PORTFOLIO-REV2
         </div>
-        <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: isDark ? 'rgba(0,255,136,0.3)' : 'rgba(26,26,46,0.4)', letterSpacing: '0.1em' }}>
+        <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: isDark ? 'rgba(206,208,206,0.5)' : 'rgba(26,26,46,0.4)', letterSpacing: '0.1em' }}>
           Engineered with intent. Built for impact.
         </div>
       </footer>

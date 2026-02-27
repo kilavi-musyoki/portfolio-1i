@@ -3,15 +3,15 @@ import PCBBoard from '../components/Board.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BOOT_LINES = [
-    { text: 'SILICON SOUL v2.0 — INITIALIZING...', delay: 0, color: '#4BD8A0' },
+    { text: 'SILICON SOUL v2.0 — INITIALIZING...', delay: 0, color: '#ced0ce' },
     { text: 'POST CHECK: RAM .................. OK', delay: 300, color: '#b0ffcc' },
     { text: 'POST CHECK: GPU .................. OK', delay: 600, color: '#b0ffcc' },
     { text: 'POST CHECK: PORTFOLIO.EXE ........ LOADED', delay: 900, color: '#b0ffcc' },
     { text: 'POST CHECK: ESP32_CORE ........... ONLINE', delay: 1200, color: '#b0ffcc' },
     { text: 'POST CHECK: RF_MODULE ............ CALIBRATED', delay: 1500, color: '#b0ffcc' },
     { text: 'POST CHECK: EGO_MODULE ........... WARN (within limits)', delay: 1800, color: '#D4A843' },
-    { text: 'MOUNTING INTERFACE ...............', delay: 2100, color: '#4DFFFF' },
-    { text: 'SIGNAL ACQUIRED. WELCOME, OPERATOR.', delay: 2400, color: '#4BD8A0' },
+    { text: 'MOUNTING INTERFACE ...............', delay: 2100, color: '#9ca09c' },
+    { text: 'SIGNAL ACQUIRED. WELCOME, OPERATOR.', delay: 2400, color: '#ffffff' },
 ];
 
 const UPTIME_START = Date.now();
@@ -95,9 +95,9 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
     const beamX = (mousePos.x - 0.5) * 40;
     const beamY = (mousePos.y - 0.5) * 20;
 
-    const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
-    const accentColor = isDark ? '#4BD8A0' : '#D4A843';
-    const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
+    const textColor = isDark ? '#ced0ce' : '#1A1A2E';
+    const accentColor = isDark ? '#ffffff' : '#D4A843';
+    const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
 
     return (
         <section
@@ -111,7 +111,7 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
             {/* Background grid */}
             <div style={{
                 position: 'absolute', inset: 0,
-                backgroundImage: `linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px)`,
+                backgroundImage: `linear-gradient(rgba(156,160,156,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(156,160,156,0.3) 1px, transparent 1px)`,
                 backgroundSize: '60px 60px',
                 opacity: isDark ? 1 : 0.3,
             }} />

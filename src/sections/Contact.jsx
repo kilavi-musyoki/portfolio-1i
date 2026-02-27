@@ -28,10 +28,10 @@ const Contact = ({ isDark }) => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
     const contactProvider = (import.meta.env.VITE_CONTACT_PROVIDER || 'api').toLowerCase(); // "api" | "emailjs"
 
-    const textColor = isDark ? '#e0f5ec' : '#1A1A2E';
-    const dimColor = isDark ? 'rgba(75,216,160,0.6)' : 'rgba(26,26,46,0.5)';
-    const accentColor = isDark ? '#4BD8A0' : '#D4A843';
-    const borderColor = isDark ? 'rgba(75,216,160,0.22)' : 'rgba(212,168,67,0.25)';
+    const textColor = isDark ? '#ced0ce' : '#1A1A2E';
+    const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
+    const accentColor = isDark ? '#ffffff' : '#D4A843';
+    const borderColor = isDark ? 'rgba(156,160,156,0.7)' : 'rgba(212,168,67,0.25)';
 
     // Animate oscilloscope
     useEffect(() => {
@@ -141,7 +141,7 @@ const Contact = ({ isDark }) => {
 
     return (
         <section id="contact" className="section-base" data-debug="contact-section"
-            style={{ background: isDark ? 'rgba(0,5,15,0.4)' : 'rgba(255,253,247,0.6)' }}
+            style={{ background: isDark ? 'rgba(57,65,57,1)' : 'rgba(255,253,247,0.6)' }}
         >
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
                 {/* Section header */}
