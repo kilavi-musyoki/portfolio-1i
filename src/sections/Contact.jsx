@@ -2,6 +2,19 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
 
+// ── Responsive hook ────────────────────────────────────────────────────────────
+const useWindowWidth = () => {
+    const [width, setWidth] = useState(() =>
+        typeof window !== 'undefined' ? window.innerWidth : 1024
+    );
+    useEffect(() => {
+        const handler = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handler);
+        return () => window.removeEventListener('resize', handler);
+    }, []);
+    return width;
+};
+
 // Oscilloscope waveform generator
 const generateWavePath = (text, isTyping, width = 480, height = 80) => {
     const amplitude = Math.min(8 + text.length * 0.4, 32);
@@ -28,11 +41,12 @@ const Contact = ({ isDark }) => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
     const contactProvider = (import.meta.env.VITE_CONTACT_PROVIDER || 'api').toLowerCase();
 
-    // ── Palette ────────────────────────────────────────────────────────────────
-    // All colours map directly to the CSS variable system in globals.css
-    // Dark  → PCB-green family  (#394139 bg, #6b716b borders, #ffffff text)
-    // Light → Blue-slate family (#f6f7fb bg, #9eb0d2 borders, #2A2A3A text)
+    // ── Responsive breakpoints ─────────────────────────────────────────────────
+    const windowWidth = useWindowWidth();
+    const isMobile  = windowWidth < 640;   // < 640px  → stack everything
+    const isTablet  = windowWidth < 900;   // < 900px  → single column main grid
 
+    // ── Palette ────────────────────────────────────────────────────────────────
     const textColor        = isDark ? '#ffffff'                     : '#2A2A3A';
     const dimColor         = isDark ? 'rgba(206,208,206,0.55)'      : 'rgba(42,47,69,0.52)';
     const accentColor      = isDark ? '#ced0ce'                     : '#50b1ce';
@@ -48,8 +62,8 @@ const Contact = ({ isDark }) => {
     const scopeGridColor   = isDark ? 'rgba(107,113,107,0.07)'      : 'rgba(80,177,206,0.07)';
     const scopeLabelColor  = isDark ? 'rgba(107,113,107,0.7)'       : 'rgba(80,177,206,0.6)';
     const waveColor        = isDark ? '#9ca09c'                     : '#50b1ce';
-    const btnColor         = isDark ? '#394139'                     : '#ffffff';   // text on filled button
-    const errorColor       = '#FF5A3C';  // --alert-red, same both modes
+    const btnColor         = isDark ? '#394139'                     : '#ffffff';
+    const errorColor       = '#FF5A3C';
 
     // ── Oscilloscope animation ─────────────────────────────────────────────────
     useEffect(() => {
@@ -144,7 +158,8 @@ const Contact = ({ isDark }) => {
             data-debug="contact-section"
             style={{ background: sectionBg }}
         >
-            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            {/* ── FIX 1: Added horizontal padding so content never touches screen edge ── */}
+            <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
 
                 {/* ── Section header ── */}
                 <motion.div
@@ -156,7 +171,13 @@ const Contact = ({ isDark }) => {
                     <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem', color: dimColor, letterSpacing: '0.15em', marginBottom: '0.5rem' }}>
                         04 — CONTACT
                     </div>
-                    <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(2rem, 4vw, 3.5rem)', color: textColor, marginBottom: '0.75rem' }}>
+                    <h2 style={{
+                        fontFamily: 'Syne, sans-serif',
+                        fontWeight: 800,
+                        fontSize: 'clamp(1.6rem, 5vw, 3.5rem)', // ── FIX 2: Lower min clamp for small screens
+                        color: textColor,
+                        marginBottom: '0.75rem',
+                    }}>
                         Let's Build Something Real.
                     </h2>
                     <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: dimColor, maxWidth: '520px', lineHeight: 1.7, marginBottom: '3rem' }}>
@@ -164,10 +185,11 @@ const Contact = ({ isDark }) => {
                     </p>
                 </motion.div>
 
+                {/* ── FIX 3: Main grid collapses to single column on tablet/mobile ── */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'clamp(260px, 35%, 360px) 1fr',
-                    gap: '3rem',
+                    gridTemplateColumns: isTablet ? '1fr' : 'clamp(260px, 35%, 360px) 1fr',
+                    gap: isMobile ? '2rem' : '3rem',
                     alignItems: 'start',
                 }}>
 
@@ -182,58 +204,66 @@ const Contact = ({ isDark }) => {
                             // CONTACT TERMINALS
                         </div>
 
-                        {[
-                            { icon: '📧', label: 'Email',       value: 'musyokikilavi870@gmail.com',       href: 'mailto:musyokikilavi870@gmail.com' },
-                            { icon: '📞', label: 'Phone',       value: '+254 700 663 557',                  href: 'tel:+254700663557' },
-                            { icon: '💼', label: 'LinkedIn',    value: 'linkedin.com/in/kilavi-musyoki',   href: 'https://www.linkedin.com/in/kilavi-musyoki' },
-                            { icon: '🐙', label: 'GitHub',      value: 'github.com/kilavi-musyoki',        href: 'https://github.com/kilavi-musyoki' },
-                            { icon: '⬇️', label: 'Download CV', value: 'Kilavi_Musyoki_CV.pdf',            href: (import.meta.env.VITE_CV_TRACKING || 'api') === 'api' ? '/api/track-download' : '/assets/Kilavi_Musyoki_CV.pdf' },
-                        ].map((item, i) => (
-                            <motion.a
-                                key={item.label}
-                                href={item.href}
-                                target={item.href.startsWith('http') ? '_blank' : undefined}
-                                rel="noopener noreferrer"
-                                initial={{ opacity: 0, x: -10 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.08 }}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    padding: '12px 16px',
-                                    marginBottom: '8px',
-                                    border: `1px solid ${borderColor}`,
-                                    borderRadius: '3px',
-                                    textDecoration: 'none',
-                                    background: cardBg,
-                                    transition: 'border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
-                                    cursor: 'pointer',
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = borderHover;
-                                    e.currentTarget.style.background   = cardBgHover;
-                                    e.currentTarget.style.boxShadow    = `0 0 14px ${accentGlow}`;
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.borderColor = borderColor;
-                                    e.currentTarget.style.background   = cardBg;
-                                    e.currentTarget.style.boxShadow    = 'none';
-                                }}
-                            >
-                                <span style={{ fontSize: '1rem', flexShrink: 0 }}>{item.icon}</span>
-                                <div style={{ minWidth: 0 }}>
-                                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', color: dimColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                                        {item.label}
+                        {/* ── FIX 4: Links display as 2-col grid on tablet, 1-col on mobile ── */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: (isTablet && !isMobile) ? '1fr 1fr' : '1fr',
+                            gap: '8px',
+                        }}>
+                            {[
+                                { icon: '📧', label: 'Email',       value: 'musyokikilavi870@gmail.com',       href: 'mailto:musyokikilavi870@gmail.com' },
+                                { icon: '📞', label: 'Phone',       value: '+254 700 663 557',                  href: 'tel:+254700663557' },
+                                { icon: '💼', label: 'LinkedIn',    value: 'linkedin.com/in/kilavi-musyoki',   href: 'https://www.linkedin.com/in/kilavi-musyoki' },
+                                { icon: '🐙', label: 'GitHub',      value: 'github.com/kilavi-musyoki',        href: 'https://github.com/kilavi-musyoki' },
+                                { icon: '⬇️', label: 'Download CV', value: 'Kilavi_Musyoki_CV.pdf',            href: (import.meta.env.VITE_CV_TRACKING || 'api') === 'api' ? '/api/track-download' : '/assets/Kilavi_Musyoki_CV.pdf' },
+                            ].map((item, i) => (
+                                <motion.a
+                                    key={item.label}
+                                    href={item.href}
+                                    target={item.href.startsWith('http') ? '_blank' : undefined}
+                                    rel="noopener noreferrer"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: i * 0.08 }}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        padding: '12px 16px',
+                                        border: `1px solid ${borderColor}`,
+                                        borderRadius: '3px',
+                                        textDecoration: 'none',
+                                        background: cardBg,
+                                        transition: 'border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
+                                        cursor: 'pointer',
+                                        // ── FIX 5: min-width 0 prevents overflow on narrow screens
+                                        minWidth: 0,
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = borderHover;
+                                        e.currentTarget.style.background   = cardBgHover;
+                                        e.currentTarget.style.boxShadow    = `0 0 14px ${accentGlow}`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = borderColor;
+                                        e.currentTarget.style.background   = cardBg;
+                                        e.currentTarget.style.boxShadow    = 'none';
+                                    }}
+                                >
+                                    <span style={{ fontSize: '1rem', flexShrink: 0 }}>{item.icon}</span>
+                                    <div style={{ minWidth: 0, flex: 1 }}>
+                                        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', color: dimColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                            {item.label}
+                                        </div>
+                                        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: accentColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {item.value}
+                                        </div>
                                     </div>
-                                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: accentColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {item.value}
-                                    </div>
-                                </div>
-                                <span style={{ marginLeft: 'auto', color: dimColor, flexShrink: 0 }}>→</span>
-                            </motion.a>
-                        ))}
+                                    <span style={{ marginLeft: 'auto', color: dimColor, flexShrink: 0 }}>→</span>
+                                </motion.a>
+                            ))}
+                        </div>
                     </motion.div>
 
                     {/* ── Right: oscilloscope + form ── */}
@@ -320,8 +350,8 @@ const Contact = ({ isDark }) => {
                                 </div>
                             )}
 
-                            {/* Name + Email row */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            {/* ── FIX 6: Name + Email stacks on mobile ── */}
+                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                                 <div>
                                     <label style={labelStyle}>NAME</label>
                                     <input className="hud-input" type="text" name="name" value={formData.name} onChange={handleInput} placeholder="Your name" required />
@@ -354,6 +384,7 @@ const Contact = ({ isDark }) => {
                                     fontWeight: 700,
                                     letterSpacing: '0.1em',
                                     padding: '14px 28px',
+                                    width: '100%', // ── FIX 7: Full width button on all screens
                                     background: status === 'sending'
                                         ? `${accentColor}55`
                                         : accentColor,
