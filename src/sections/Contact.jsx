@@ -37,15 +37,12 @@ const Contact = ({ isDark }) => {
     const [wavePath, setWavePath] = useState('');
 
     // ── Google Sheets webhook ──────────────────────────────────────────────────
-    // One URL handles both contact form submissions and CV download logs.
-    // Add VITE_GOOGLE_SHEET_WEBHOOK=https://script.google.com/macros/s/.../exec
-    // to your .env file at the project root.
     const webhook = import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK;
 
     // ── Responsive breakpoints ─────────────────────────────────────────────────
     const windowWidth = useWindowWidth();
-    const isMobile  = windowWidth < 640;   // < 640px  → stack everything
-    const isTablet  = windowWidth < 900;   // < 900px  → single column main grid
+    const isMobile  = windowWidth < 640;
+    const isTablet  = windowWidth < 900;
 
     // ── Palette ────────────────────────────────────────────────────────────────
     const textColor        = isDark ? '#ffffff'                     : '#2A2A3A';
@@ -89,8 +86,6 @@ const Contact = ({ isDark }) => {
     }, []);
 
     // ── Shared Google Sheets logger ────────────────────────────────────────────
-    // Uses mode: 'no-cors' because Apps Script doesn't return CORS headers.
-    // Fire-and-forget — we never read the response body.
     const logToSheet = useCallback((payload) => {
         if (!webhook) return;
         fetch(webhook, {
@@ -101,7 +96,7 @@ const Contact = ({ isDark }) => {
         }).catch(() => {});
     }, [webhook]);
 
-    // ── Form submit → Google Sheets (Messages tab) ─────────────────────────────
+    // ── Form submit → Google Sheets ────────────────────────────────────────────
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('sending');
@@ -114,8 +109,6 @@ const Contact = ({ isDark }) => {
                 subject:   formData.subject,
                 message:   formData.message,
             });
-            // Optimistic success — no-cors means we can't read the response,
-            // but Apps Script is reliable enough for a portfolio contact form.
             setStatus('sent');
             setTimeout(() => {
                 setStatus('idle');
@@ -128,8 +121,8 @@ const Contact = ({ isDark }) => {
         }
     };
 
-    // ── CV download handler → logs to Sheets then opens the PDF ───────────────
-    // PDF lives at /assets/Kilavi_Musyoki_CV.pdf inside your repo's public folder.
+    // ── CV download handler ────────────────────────────────────────────────────
+    // PDF must be placed at: public/assets/Kilavi_Musyoki_CV.pdf
     const handleCvDownload = useCallback((e) => {
         e.preventDefault();
         logToSheet({
@@ -138,7 +131,12 @@ const Contact = ({ isDark }) => {
             referrer:  document.referrer   || null,
             userAgent: navigator.userAgent || null,
         });
-        window.open('/assets/Kilavi_Musyoki_CV.pdf', '_blank', 'noopener,noreferrer');
+        const a = document.createElement('a');
+        a.href     = '/assets/Kilavi_Musyoki_CV.pdf';
+        a.download = 'Kilavi_Musyoki_CV.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }, [logToSheet]);
 
     // ── Shared style helpers ───────────────────────────────────────────────────
@@ -248,7 +246,7 @@ const Contact = ({ isDark }) => {
                                     label:   'Download CV',
                                     value:   'Kilavi_Musyoki_CV.pdf',
                                     href:    '#',
-                                    onClick: handleCvDownload,  // logs to Sheets then opens PDF
+                                    onClick: handleCvDownload,
                                 },
                             ].map((item, i) => (
                                 <motion.a
