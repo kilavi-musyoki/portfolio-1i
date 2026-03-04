@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import emailjs from '@emailjs/browser';
 
 // ── Responsive hook ────────────────────────────────────────────────────────────
 const useWindowWidth = () => {
@@ -15,7 +14,7 @@ const useWindowWidth = () => {
     return width;
 };
 
-// Oscilloscope waveform generator
+// ── Oscilloscope waveform generator ───────────────────────────────────────────
 const generateWavePath = (text, isTyping, width = 480, height = 80) => {
     const amplitude = Math.min(8 + text.length * 0.4, 32);
     const freq = isTyping ? 0.06 : 0.03;
@@ -28,18 +27,20 @@ const generateWavePath = (text, isTyping, width = 480, height = 80) => {
 };
 
 const Contact = ({ isDark }) => {
-    const formRef = useRef(null);
-    const wavePathRef = useRef(null);
-    const rafRef = useRef(null);
-    const turnstileWidgetRef = useRef(null);
-    const turnstileLoadedRef = useRef(false);
+    const formRef        = useRef(null);
+    const rafRef         = useRef(null);
+    const typingTimerRef = useRef(null);
+
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
-    const [status, setStatus] = useState('idle'); // idle | sending | sent | error
+    const [status,   setStatus]   = useState('idle'); // idle | sending | sent | error
     const [isTyping, setIsTyping] = useState(false);
     const [wavePath, setWavePath] = useState('');
-    const typingTimerRef = useRef(null);
-    const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
-    const contactProvider = (import.meta.env.VITE_CONTACT_PROVIDER || 'api').toLowerCase();
+
+    // ── Google Sheets webhook ──────────────────────────────────────────────────
+    // One URL handles both contact form submissions and CV download logs.
+    // Add VITE_GOOGLE_SHEET_WEBHOOK=https://script.google.com/macros/s/.../exec
+    // to your .env file at the project root.
+    const webhook = import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK;
 
     // ── Responsive breakpoints ─────────────────────────────────────────────────
     const windowWidth = useWindowWidth();
@@ -78,22 +79,7 @@ const Contact = ({ isDark }) => {
         return () => cancelAnimationFrame(rafRef.current);
     }, [formData, isTyping, status]);
 
-    // ── Turnstile ──────────────────────────────────────────────────────────────
-    useEffect(() => {
-        if (!siteKey) return;
-        if (turnstileLoadedRef.current) return;
-        const existing = document.querySelector('script[data-turnstile]');
-        if (existing) { turnstileLoadedRef.current = true; return; }
-        const script = document.createElement('script');
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-        script.async = true;
-        script.defer = true;
-        script.setAttribute('data-turnstile', 'true');
-        document.body.appendChild(script);
-        script.onload = () => { turnstileLoadedRef.current = true; };
-        return () => { script.remove(); };
-    }, [siteKey]);
-
+    // ── Input handler ──────────────────────────────────────────────────────────
     const handleInput = useCallback((e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -102,32 +88,34 @@ const Contact = ({ isDark }) => {
         typingTimerRef.current = setTimeout(() => setIsTyping(false), 500);
     }, []);
 
+    // ── Shared Google Sheets logger ────────────────────────────────────────────
+    // Uses mode: 'no-cors' because Apps Script doesn't return CORS headers.
+    // Fire-and-forget — we never read the response body.
+    const logToSheet = useCallback((payload) => {
+        if (!webhook) return;
+        fetch(webhook, {
+            method:  'POST',
+            mode:    'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload),
+        }).catch(() => {});
+    }, [webhook]);
+
+    // ── Form submit → Google Sheets (Messages tab) ─────────────────────────────
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('sending');
         try {
-            let turnstileToken = null;
-            if (siteKey && window.turnstile && turnstileWidgetRef.current) {
-                try { turnstileToken = window.turnstile.getResponse(turnstileWidgetRef.current); }
-                catch { turnstileToken = null; }
-            }
-
-            if (contactProvider === 'emailjs') {
-                await emailjs.send(
-                    import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                    import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                    { from_name: formData.name, from_email: formData.email, subject: formData.subject, message: formData.message },
-                    import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-                );
-            } else {
-                const response = await fetch('/api/contact', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ...formData, turnstileToken }),
-                });
-                if (!response.ok) throw new Error('API error');
-            }
-
+            logToSheet({
+                type:      'contact',
+                timestamp: new Date().toISOString(),
+                name:      formData.name,
+                email:     formData.email,
+                subject:   formData.subject,
+                message:   formData.message,
+            });
+            // Optimistic success — no-cors means we can't read the response,
+            // but Apps Script is reliable enough for a portfolio contact form.
             setStatus('sent');
             setTimeout(() => {
                 setStatus('idle');
@@ -140,16 +128,38 @@ const Contact = ({ isDark }) => {
         }
     };
 
+    // ── CV download handler → logs to Sheets then opens the PDF ───────────────
+    // PDF lives at /assets/Kilavi_Musyoki_CV.pdf inside your repo's public folder.
+    const handleCvDownload = useCallback((e) => {
+        e.preventDefault();
+        logToSheet({
+            type:      'cv_download',
+            timestamp: new Date().toISOString(),
+            referrer:  document.referrer   || null,
+            userAgent: navigator.userAgent || null,
+        });
+        window.open('/assets/Kilavi_Musyoki_CV.pdf', '_blank', 'noopener,noreferrer');
+    }, [logToSheet]);
+
     // ── Shared style helpers ───────────────────────────────────────────────────
     const labelStyle = {
-        fontFamily: 'JetBrains Mono, monospace',
-        fontSize: '0.6rem',
-        color: dimColor,
+        fontFamily:    'JetBrains Mono, monospace',
+        fontSize:      '0.6rem',
+        color:         dimColor,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
-        display: 'block',
-        marginBottom: '4px',
+        display:       'block',
+        marginBottom:  '4px',
     };
+
+    // ── Scope status label ─────────────────────────────────────────────────────
+    const scopeStatusLabel = isTyping
+        ? 'RECEIVING...'
+        : status === 'sent'
+            ? 'SIGNAL CLEAR'
+            : status === 'sending'
+                ? 'TRANSMITTING...'
+                : 'STANDBY';
 
     return (
         <section
@@ -158,7 +168,6 @@ const Contact = ({ isDark }) => {
             data-debug="contact-section"
             style={{ background: sectionBg }}
         >
-            {/* ── FIX 1: Added horizontal padding so content never touches screen edge ── */}
             <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
 
                 {/* ── Section header ── */}
@@ -172,10 +181,10 @@ const Contact = ({ isDark }) => {
                         04 — CONTACT
                     </div>
                     <h2 style={{
-                        fontFamily: 'Syne, sans-serif',
-                        fontWeight: 800,
-                        fontSize: 'clamp(1.6rem, 5vw, 3.5rem)', // ── FIX 2: Lower min clamp for small screens
-                        color: textColor,
+                        fontFamily:   'Syne, sans-serif',
+                        fontWeight:   800,
+                        fontSize:     'clamp(1.6rem, 5vw, 3.5rem)',
+                        color:        textColor,
                         marginBottom: '0.75rem',
                     }}>
                         Let's Build Something Real.
@@ -185,12 +194,12 @@ const Contact = ({ isDark }) => {
                     </p>
                 </motion.div>
 
-                {/* ── FIX 3: Main grid collapses to single column on tablet/mobile ── */}
+                {/* ── Main grid ── */}
                 <div style={{
-                    display: 'grid',
+                    display:             'grid',
                     gridTemplateColumns: isTablet ? '1fr' : 'clamp(260px, 35%, 360px) 1fr',
-                    gap: isMobile ? '2rem' : '3rem',
-                    alignItems: 'start',
+                    gap:                 isMobile ? '2rem' : '3rem',
+                    alignItems:          'start',
                 }}>
 
                     {/* ── Left: contact links ── */}
@@ -204,22 +213,48 @@ const Contact = ({ isDark }) => {
                             // CONTACT TERMINALS
                         </div>
 
-                        {/* ── FIX 4: Links display as 2-col grid on tablet, 1-col on mobile ── */}
                         <div style={{
-                            display: 'grid',
+                            display:             'grid',
                             gridTemplateColumns: (isTablet && !isMobile) ? '1fr 1fr' : '1fr',
-                            gap: '8px',
+                            gap:                 '8px',
                         }}>
                             {[
-                                { icon: '📧', label: 'Email',       value: 'musyokikilavi870@gmail.com',       href: 'mailto:musyokikilavi870@gmail.com' },
-                                { icon: '📞', label: 'Phone',       value: '+254 700 663 557',                  href: 'tel:+254700663557' },
-                                { icon: '💼', label: 'LinkedIn',    value: 'linkedin.com/in/kilavi-musyoki',   href: 'https://www.linkedin.com/in/kilavi-musyoki' },
-                                { icon: '🐙', label: 'GitHub',      value: 'github.com/kilavi-musyoki',        href: 'https://github.com/kilavi-musyoki' },
-                                { icon: '⬇️', label: 'Download CV', value: 'Kilavi_Musyoki_CV.pdf',            href: (import.meta.env.VITE_CV_TRACKING || 'api') === 'api' ? '/api/track-download' : '/assets/Kilavi MusyokiCV.pdf' },
+                                {
+                                    icon:  '📧',
+                                    label: 'Email',
+                                    value: 'musyokikilavi870@gmail.com',
+                                    href:  'mailto:musyokikilavi870@gmail.com',
+                                },
+                                {
+                                    icon:  '📞',
+                                    label: 'Phone',
+                                    value: '+254 700 663 557',
+                                    href:  'tel:+254700663557',
+                                },
+                                {
+                                    icon:  '💼',
+                                    label: 'LinkedIn',
+                                    value: 'linkedin.com/in/kilavi-musyoki',
+                                    href:  'https://www.linkedin.com/in/kilavi-musyoki',
+                                },
+                                {
+                                    icon:  '🐙',
+                                    label: 'GitHub',
+                                    value: 'github.com/kilavi-musyoki',
+                                    href:  'https://github.com/kilavi-musyoki',
+                                },
+                                {
+                                    icon:    '⬇️',
+                                    label:   'Download CV',
+                                    value:   'Kilavi_Musyoki_CV.pdf',
+                                    href:    '#',
+                                    onClick: handleCvDownload,  // logs to Sheets then opens PDF
+                                },
                             ].map((item, i) => (
                                 <motion.a
                                     key={item.label}
                                     href={item.href}
+                                    onClick={item.onClick}
                                     target={item.href.startsWith('http') ? '_blank' : undefined}
                                     rel="noopener noreferrer"
                                     initial={{ opacity: 0, x: -10 }}
@@ -227,28 +262,27 @@ const Contact = ({ isDark }) => {
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.08 }}
                                     style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '12px',
-                                        padding: '12px 16px',
-                                        border: `1px solid ${borderColor}`,
-                                        borderRadius: '3px',
+                                        display:        'flex',
+                                        alignItems:     'center',
+                                        gap:            '12px',
+                                        padding:        '12px 16px',
+                                        border:         `1px solid ${borderColor}`,
+                                        borderRadius:   '3px',
                                         textDecoration: 'none',
-                                        background: cardBg,
-                                        transition: 'border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
-                                        cursor: 'pointer',
-                                        // ── FIX 5: min-width 0 prevents overflow on narrow screens
-                                        minWidth: 0,
+                                        background:     cardBg,
+                                        transition:     'border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
+                                        cursor:         'pointer',
+                                        minWidth:       0,
                                     }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.borderColor = borderHover;
-                                        e.currentTarget.style.background   = cardBgHover;
-                                        e.currentTarget.style.boxShadow    = `0 0 14px ${accentGlow}`;
+                                        e.currentTarget.style.background  = cardBgHover;
+                                        e.currentTarget.style.boxShadow   = `0 0 14px ${accentGlow}`;
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.borderColor = borderColor;
-                                        e.currentTarget.style.background   = cardBg;
-                                        e.currentTarget.style.boxShadow    = 'none';
+                                        e.currentTarget.style.background  = cardBg;
+                                        e.currentTarget.style.boxShadow   = 'none';
                                     }}
                                 >
                                     <span style={{ fontSize: '1rem', flexShrink: 0 }}>{item.icon}</span>
@@ -274,22 +308,20 @@ const Contact = ({ isDark }) => {
                         transition={{ duration: 0.6, delay: 0.2 }}
                     >
                         {/* Oscilloscope display */}
-                        <div
-                            style={{
-                                marginBottom: '16px',
-                                height: '100px',
-                                position: 'relative',
-                                background: scopeBg,
-                                border: `2px solid ${scopeBorderColor}`,
-                                borderRadius: '8px',
-                                overflow: 'hidden',
-                                transition: 'background 0.4s, border-color 0.4s',
-                            }}
-                        >
+                        <div style={{
+                            marginBottom: '16px',
+                            height:       '100px',
+                            position:     'relative',
+                            background:   scopeBg,
+                            border:       `2px solid ${scopeBorderColor}`,
+                            borderRadius: '8px',
+                            overflow:     'hidden',
+                            transition:   'background 0.4s, border-color 0.4s',
+                        }}>
                             {/* Grid */}
                             <div style={{
-                                position: 'absolute',
-                                inset: 0,
+                                position:        'absolute',
+                                inset:           0,
                                 backgroundImage: `
                                     linear-gradient(${scopeGridColor} 1px, transparent 1px),
                                     linear-gradient(90deg, ${scopeGridColor} 1px, transparent 1px)
@@ -306,7 +338,9 @@ const Contact = ({ isDark }) => {
                                 {status === 'sent' ? (
                                     <>
                                         <line x1="0" y1="50" x2="480" y2="50" stroke={accentColor} strokeWidth="1.5" opacity="0.6" />
-                                        <motion.circle cx="240" cy="50" r="0" fill={`${accentColor}44`}
+                                        <motion.circle
+                                            cx="240" cy="50" r="0"
+                                            fill={`${accentColor}44`}
                                             animate={{ r: [0, 80, 0] }}
                                             transition={{ duration: 1.5, ease: 'easeOut' }}
                                         />
@@ -322,35 +356,35 @@ const Contact = ({ isDark }) => {
                             <div style={{ position: 'absolute', top: '5px', left: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: scopeLabelColor }}>
                                 CH1: SIGNAL · 50mV/div
                             </div>
-                            <div style={{ position: 'absolute', top: '5px', right: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: scopeLabelColor }}>
-                                {isTyping ? 'RECEIVING...' : 'STANDBY'}
+                            <div style={{ position: 'absolute', top: '5px', right: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: status === 'error' ? errorColor : scopeLabelColor, transition: 'color 0.3s' }}>
+                                {scopeStatusLabel}
                             </div>
                         </div>
 
                         {/* Status messages */}
                         {status === 'sent' && (
-                            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: accentColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}>
+                            <motion.div
+                                initial={{ opacity: 0, y: -6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: accentColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}
+                            >
                                 ✓ SIGNAL TRANSMITTED. AWAITING RESPONSE...
-                            </div>
+                            </motion.div>
                         )}
                         {status === 'error' && (
-                            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: errorColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}>
+                            <motion.div
+                                initial={{ opacity: 0, y: -6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: errorColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}
+                            >
                                 ✗ TRANSMISSION FAILED. CHECK SIGNAL.
-                            </div>
+                            </motion.div>
                         )}
 
                         {/* Form */}
                         <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 
-                            {/* Turnstile */}
-                            {siteKey && (
-                                <div style={{ marginBottom: '8px' }}>
-                                    <div style={labelStyle}>HUMAN VERIFICATION</div>
-                                    <div ref={turnstileWidgetRef} className="cf-turnstile" data-sitekey={siteKey} />
-                                </div>
-                            )}
-
-                            {/* ── FIX 6: Name + Email stacks on mobile ── */}
+                            {/* Name + Email */}
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                                 <div>
                                     <label style={labelStyle}>NAME</label>
@@ -379,22 +413,20 @@ const Contact = ({ isDark }) => {
                                 type="submit"
                                 disabled={status === 'sending'}
                                 style={{
-                                    fontFamily: 'JetBrains Mono, monospace',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 700,
+                                    fontFamily:    'JetBrains Mono, monospace',
+                                    fontSize:      '0.8rem',
+                                    fontWeight:    700,
                                     letterSpacing: '0.1em',
-                                    padding: '14px 28px',
-                                    width: '100%', // ── FIX 7: Full width button on all screens
-                                    background: status === 'sending'
-                                        ? `${accentColor}55`
-                                        : accentColor,
-                                    color: btnColor,
-                                    border: 'none',
-                                    borderRadius: '2px',
-                                    cursor: status === 'sending' ? 'not-allowed' : 'pointer',
+                                    padding:       '14px 28px',
+                                    width:         '100%',
+                                    background:    status === 'sending' ? `${accentColor}55` : accentColor,
+                                    color:         btnColor,
+                                    border:        'none',
+                                    borderRadius:  '2px',
+                                    cursor:        status === 'sending' ? 'not-allowed' : 'pointer',
                                     textTransform: 'uppercase',
-                                    transition: 'all 0.2s ease',
-                                    boxShadow: `0 0 20px ${accentGlow}`,
+                                    transition:    'all 0.2s ease',
+                                    boxShadow:     `0 0 20px ${accentGlow}`,
                                 }}
                                 onMouseEnter={(e) => {
                                     if (status !== 'sending') {
