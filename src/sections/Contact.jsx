@@ -215,7 +215,7 @@ const Contact = ({ isDark }) => {
                                 { icon: '📞', label: 'Phone',       value: '+254 700 663 557',                  href: 'tel:+254700663557' },
                                 { icon: '💼', label: 'LinkedIn',    value: 'linkedin.com/in/kilavi-musyoki',   href: 'https://www.linkedin.com/in/kilavi-musyoki' },
                                 { icon: '🐙', label: 'GitHub',      value: 'github.com/kilavi-musyoki',        href: 'https://github.com/kilavi-musyoki' },
-                                { icon: '⬇️', label: 'Download CV', value: 'Kilavi_Musyoki_CV.pdf',            href: (import.meta.env.VITE_CV_TRACKING || 'api') === 'api' ? '/api/track-download' : '/assets/Kilavi_Musyoki_CV.pdf' },
+                                { icon: '⬇️', label: 'Download CV', value: 'Kilavi_Musyoki_CV.pdf',            href: (import.meta.env.VITE_CV_TRACKING || 'api') === 'api' ? '/api/track-download' : '/assets/Kilavi Musyoki CV.pdf' },
                             ].map((item, i) => (
                                 <motion.a
                                     key={item.label}
