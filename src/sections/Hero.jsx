@@ -334,12 +334,13 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                             </div>
 
                             {/* Stats strip */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
                                 {[
-                                    { val: '2027', label: 'Expected Grad' },
-                                    { val: '5',    label: 'Projects'      },
-                                    { val: '3',    label: 'Languages'     },
-                                    { val: '∞',    label: 'Problems Left' },
+                                    { val: '1000+', label: 'Hours Building' },
+                                    { val: '10+',    label: 'Projects'      },
+                                    { val: '4+', label: 'Systems Designed' },
+                                    { val: 'Daily', label: 'Learning Rate' },
+                                    { val: '∞',    label: 'Problems Left' },                                  
                                 ].map((stat) => (
                                     <div key={stat.label} style={{ textAlign: 'center' }}>
                                         <div style={{
