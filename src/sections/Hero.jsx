@@ -334,7 +334,7 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                             </div>
 
                             {/* Stats strip */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
                                 {[
                                     { val: '1000+', label: 'Hours Building' },
                                     { val: '10+',    label: 'Projects'      },
@@ -342,11 +342,11 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                                     { val: 'Daily', label: 'Learning Rate' },
                                     { val: '∞',    label: 'Problems Left' },                                  
                                 ].map((stat) => (
-                                    <div key={stat.label} style={{ textAlign: 'center' }}>
+                                    <div key={stat.label} style={{ textAlign: 'center', padding: '0.5rem 0' }}>
                                         <div style={{
                                             fontFamily: 'Syne, sans-serif',
                                             fontWeight: 700,
-                                            fontSize: '1.8rem',
+                                            fontSize: 'clamp(1.4rem, 5vw, 1.8rem)',
                                             color: accentColor,
                                             lineHeight: 1,
                                         }}>
@@ -354,7 +354,7 @@ const Hero = ({ isDark, layer = 'components', glitch = false }) => {
                                         </div>
                                         <div style={{
                                             fontFamily: 'JetBrains Mono, monospace',
-                                            fontSize: '0.55rem',
+                                            fontSize: 'clamp(0.55rem, 2.5vw, 0.65rem)',
                                             color: dimColor,
                                             marginTop: '4px',
                                             letterSpacing: '0.05em',
