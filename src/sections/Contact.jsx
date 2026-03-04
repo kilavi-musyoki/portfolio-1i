@@ -131,12 +131,26 @@ const Contact = ({ isDark }) => {
             referrer:  document.referrer   || null,
             userAgent: navigator.userAgent || null,
         });
-        const a = document.createElement('a');
-        a.href     = '/assets/Kilavi_Musyoki_CV.pdf';
-        a.download = 'Kilavi_Musyoki_CV.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        // Force browser download by fetching as blob
+        fetch('/assets/Kilavi_Musyoki_CV.pdf')
+            .then(res => {
+                if (!res.ok) throw new Error('File not found');
+                return res.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a   = document.createElement('a');
+                a.href     = url;
+                a.download = 'Kilavi_Musyoki_CV.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            })
+            .catch(() => {
+                // Fallback: open in new tab if blob fetch fails
+                window.open('/assets/Kilavi_Musyoki_CV.pdf', '_blank', 'noopener,noreferrer');
+            });
     }, [logToSheet]);
 
     // ── Shared style helpers ───────────────────────────────────────────────────
