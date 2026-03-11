@@ -5,15 +5,20 @@ const PROJECTS = [
     {
         id: 'p1',
         number: '01',
-        title: 'Firebase Real-Time Voting Platform',
-        subtitle: 'Real-time democratic decision infrastructure',
-        problem: 'Organizations needed a transparent, tamper-resistant voting system for concurrent votes with live result visibility and zero server maintenance burden.',
-        approach: 'Serverless React SPA backed by Cloud Firestore with security rules enforcing one-vote-per-authenticated-user. Real-time listeners propagate vote counts without polling. Firebase Auth for session management; Firestore transactions prevent race conditions.',
-        outcome: 'Sub-100ms result propagation to all connected clients. Zero server costs at scale. Double-voting prevented at database rule level, independent of client logic.',
-        lessons: 'Firestore security rules are Turing-complete but tricky — early iterations had a race condition during simultaneous votes requiring transactional write pattern. Client-side validation is never a substitute for server-side rule enforcement.',
-        stack: ['React', 'Firebase Auth', 'Cloud Firestore', 'Firebase Hosting', 'Tailwind CSS'],
-        color: '#ffffff',
+        title: 'ClubVote Secure Election Platform',
+        subtitle: 'Anonymous web-based voting system with cryptographic verification',
+        problem:
+            'Student clubs and small organizations often run elections using informal methods such as paper ballots or messaging apps, which lack transparency, auditability, and security. A digital system was needed to provide anonymous voting, prevent double voting, and allow administrators to manage elections while maintaining voter privacy.',
+        approach:
+            'Designed a full-stack election platform using a React + TypeScript frontend and a Node.js/Express backend with PostgreSQL. Authentication is handled using JWT with bcrypt password hashing. Votes are stored anonymously and protected using a cryptographic hash chain to guarantee vote integrity. Prisma ORM manages relational data models for users, elections, positions, and votes. Automated election scheduling is implemented with cron jobs, while Puppeteer generates official PDF election reports. Role-based access control allows Super Admins, Club Admins, Candidates, and Voters to interact with the system securely.',
+        outcome:
+            'Delivered a secure web platform capable of managing full election cycles including candidate registration, voting, automated opening/closing of elections, and real-time result generation. The system supports hundreds of concurrent voters while maintaining anonymous vote records and a verifiable audit trail.',
+        lessons:
+            'Separating voter identity from vote data was essential for anonymity while still preventing double voting. Implementing a cryptographic hash chain provided an auditable vote sequence but required careful transaction handling to maintain consistency. Strict TypeScript typing across frontend and backend significantly reduced runtime errors during development.',
+        stack: ['React', 'TypeScript', 'Node.js / Express', 'PostgreSQL', 'Prisma ORM', 'JWT Authentication', 'Tailwind CSS', 'Docker'],
+        color: '#2563eb',
         icon: '🗳️',
+        repo: 'https://github.com/kilavi-musyoki/voting-website.git',
     },
     {
         id: 'p2',
@@ -27,6 +32,7 @@ const PROJECTS = [
         stack: ['ESP32 (C++)', 'FreeRTOS', 'MQ-2 / DHT22', 'MQTT / Mosquitto', 'Node-RED', 'Telegram Bot API'],
         color: '#ced0ce',
         icon: '🔥',
+        repo: null,
     },
     {
         id: 'p3',
@@ -36,10 +42,11 @@ const PROJECTS = [
         problem: 'Embedded display systems operating on 24-hour BCD time need 12-hour format output for user interfaces — including AM/PM detection, tens-digit rollover, and midnight/noon edge cases — all without a microcontroller.',
         approach: 'Combinational and sequential digital logic using comparators, BCD decoders, flip-flops, and a multiplexer network. Tens-of-hours digit conditionally suppressed for hours 01–09. Dedicated comparator block for 12:xx AM/PM toggling; second comparator for 00:xx → 12:xx midnight remapping. Full circuit built and exhaustively simulated in Logisim Evolution with 1,440 test vectors.',
         outcome: 'Verified functional correctness across all 1,440 daily minute-states. All edge cases handled without glitching or invalid BCD output.',
-        lessons: 'Midnight/noon conversions require separate comparator branches — one threshold comparator can\'t differentiate both. BCD addition overflow must be corrected explicitly; binary adders produce values above 9 without a correction stage.',
+        lessons: "Midnight/noon conversions require separate comparator branches — one threshold comparator can't differentiate both. BCD addition overflow must be corrected explicitly; binary adders produce values above 9 without a correction stage.",
         stack: ['Logisim Evolution', 'BCD Logic', 'Combinational Circuits', 'Flip-Flops', 'Comparators', 'MUX/DEMUX'],
         color: '#9ca09c',
         icon: '🕐',
+        repo: 'https://github.com/kilavi-musyoki/digital-clock-with-logism.git',
     },
     {
         id: 'p4',
@@ -53,6 +60,7 @@ const PROJECTS = [
         stack: ['AVR Microcontroller (C)', 'PIR Sensor', 'LDR', 'DHT22', 'DS3231 RTC', '16×2 LCD', 'Servo', 'Relay'],
         color: '#6b716b',
         icon: '🏠',
+        repo: null,
     },
     {
         id: 'p5',
@@ -66,14 +74,76 @@ const PROJECTS = [
         stack: ['Keysight ADS', 'Momentum EM Solver', 'LineCalc', 'MATLAB', 'S-parameter Analysis'],
         color: '#394139',
         icon: '📡',
+        repo: null,
+    },
+    {
+        id: 'p6',
+        number: '06',
+        title: 'LinkUp Notes — Secure Android Notes App',
+        subtitle: 'Offline-first notes with AES-256 encryption & biometric lock',
+        problem: 'Most note-taking apps either lack meaningful security or require cloud connectivity, exposing sensitive personal notes to data breaches or loss of access offline. A fully local solution was needed with hardware-backed encryption and zero-trust access control at both app and note level.',
+        approach: 'Built with Kotlin and Jetpack Compose following MVVM architecture. AES-256-GCM encryption is backed by Android Keystore hardware keys; notes are encrypted before hitting the Room/SQLite layer. Biometric authentication (fingerprint/face with PIN fallback) gates app entry with configurable auto-lock timeouts. Individual notes can be independently locked. A rich text editor with formatting toolbar, tag-based organization, full-text search, and undo/redo round out the feature set. Export to TXT, Markdown, and PDF is supported via FileProvider sharing.',
+        outcome: 'Fully functional offline notes app with hardware-backed encryption, per-note locking, multi-select bulk actions, auto-save, crash recovery, and a 30-day soft-delete trash system. All security layers operate without any network dependency.',
+        lessons: 'Note-level locking required careful separation between the biometric prompt lifecycle and Compose recomposition — tightly coupling them caused the auth dialog to dismiss unexpectedly on rotation. Android Keystore key invalidation on biometric enrollment changes also needed explicit handling to avoid silent decryption failures.',
+        stack: ['Kotlin', 'Jetpack Compose', 'Material 3', 'Room / SQLite', 'AES-256-GCM', 'Android Keystore', 'AndroidX Biometric', 'Kotlin Coroutines'],
+        color: '#16a34a',
+        icon: '🔐',
+        repo: 'https://github.com/kilavi-musyoki/notes-app.git',
     },
 ];
 
-const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
+const RepoLink = ({ url, color }) => {
+    if (!url) return null;
+    return (
+        <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '0.6rem',
+                color: color,
+                textDecoration: 'none',
+                padding: '4px 10px',
+                border: `1px solid ${color}33`,
+                borderRadius: '2px',
+                background: `${color}08`,
+                letterSpacing: '0.08em',
+                transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.background = `${color}18`;
+                e.currentTarget.style.borderColor = `${color}66`;
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.background = `${color}08`;
+                e.currentTarget.style.borderColor = `${color}33`;
+            }}
+        >
+            {/* GitHub SVG icon */}
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.898-.015 3.293 0 .322.216.694.825.576C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            VIEW REPOSITORY ↗
+        </a>
+    );
+};
+
+const ProjectCard = ({ project, isDark, isExpanded, onToggle, isLast }) => {
     const textColor = isDark ? '#ced0ce' : '#1A1A2E';
     const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
-    const borderColor = isDark ? `${project.color}33` : `${project.color}44`;
-    const bgCard = isDark ? `${project.color}08` : `${project.color}06`;
+
+    // Last card gets a more muted, faded treatment but still visible
+    const opacity = isLast ? 0.72 : 1;
+    const borderOpacity = isLast ? '1a' : (isExpanded ? '55' : '22');
+    const bgOpacity = isLast ? '05' : (isExpanded ? '0a' : '06');
+
+    const borderColor = `${project.color}${borderOpacity}`;
+    const bgCard = `${project.color}${bgOpacity}`;
 
     return (
         <motion.div
@@ -84,14 +154,16 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
             transition={{ duration: 0.5 }}
             className="pcb-card"
             style={{
-                border: `1px solid ${isExpanded ? project.color + '77' : borderColor}`,
-                background: isExpanded ? `${project.color}0c` : bgCard,
+                border: `1px solid ${borderColor}`,
+                background: isExpanded ? `${project.color}0a` : bgCard,
                 borderRadius: '4px',
                 overflow: 'hidden',
                 cursor: 'pointer',
-                boxShadow: isExpanded ? `0 0 30px ${project.color}20` : 'none',
+                opacity: opacity,
+                boxShadow: isExpanded ? `0 0 24px ${project.color}14` : 'none',
                 transition: 'all 0.3s ease',
             }}
+            whileHover={{ opacity: isLast ? 0.92 : 1 }}
             onClick={onToggle}
         >
             {/* Card header */}
@@ -106,9 +178,9 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                     {/* Module icon */}
                     <div style={{
                         width: '48px', height: '48px', flexShrink: 0,
-                        border: `1px solid ${project.color}55`,
+                        border: `1px solid ${project.color}33`,
                         borderRadius: '3px',
-                        background: `${project.color}12`,
+                        background: `${project.color}0e`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '1.5rem',
                     }}>
@@ -116,10 +188,10 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                     </div>
                     <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: project.color, letterSpacing: '0.1em' }}>
+                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: project.color, letterSpacing: '0.1em', opacity: isLast ? 0.7 : 1 }}>
                                 MODULE {project.number}
                             </span>
-                            <div style={{ width: '40px', height: '1px', background: `${project.color}44` }} />
+                            <div style={{ width: '40px', height: '1px', background: `${project.color}33` }} />
                         </div>
                         <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '1.1rem', color: textColor, marginBottom: '4px' }}>
                             {project.title}
@@ -134,13 +206,13 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                 <motion.div
                     animate={{ rotate: isExpanded ? 45 : 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ color: project.color, fontSize: '1.2rem', flexShrink: 0, marginTop: '4px' }}
+                    style={{ color: project.color, fontSize: '1.2rem', flexShrink: 0, marginTop: '4px', opacity: isLast ? 0.6 : 1 }}
                 >
                     +
                 </motion.div>
             </div>
 
-                    {/* Expanded content (shortened copy) */}
+            {/* Expanded content */}
             <AnimatePresence>
                 {isExpanded && (
                     <motion.div
@@ -153,14 +225,14 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                     >
                         <div style={{
                             padding: '0 24px 20px',
-                            borderTop: `1px solid ${project.color}22`,
+                            borderTop: `1px solid ${project.color}18`,
                             paddingTop: '16px',
                             display: 'grid',
                             gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)',
                             gap: '16px',
                         }}>
                             <div>
-                                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '6px' }}>
+                                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '6px', opacity: 0.8 }}>
                                     // OVERVIEW
                                 </div>
                                 <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: textColor, lineHeight: 1.7 }}>
@@ -168,7 +240,7 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                                 </p>
                             </div>
                             <div>
-                                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '6px' }}>
+                                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: project.color, letterSpacing: '0.1em', marginBottom: '6px', opacity: 0.8 }}>
                                     // RESULT
                                 </div>
                                 <p style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: dimColor, lineHeight: 1.7 }}>
@@ -177,31 +249,34 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
                             </div>
                         </div>
 
-                        {/* Stack tags */}
-                        <div style={{ padding: '12px 24px 20px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                            {project.stack.map((tech) => (
-                                <span key={tech} style={{
-                                    fontFamily: 'JetBrains Mono',
-                                    fontSize: '0.6rem',
-                                    padding: '3px 8px',
-                                    border: `1px solid ${project.color}44`,
-                                    borderRadius: '2px',
-                                    color: project.color,
-                                    background: `${project.color}10`,
-                                    letterSpacing: '0.04em',
-                                }}>
-                                    {tech}
-                                </span>
-                            ))}
+                        {/* Stack tags + repo link row */}
+                        <div style={{ padding: '12px 24px 20px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {project.stack.map((tech) => (
+                                    <span key={tech} style={{
+                                        fontFamily: 'JetBrains Mono',
+                                        fontSize: '0.6rem',
+                                        padding: '3px 8px',
+                                        border: `1px solid ${project.color}33`,
+                                        borderRadius: '2px',
+                                        color: project.color,
+                                        background: `${project.color}0c`,
+                                        letterSpacing: '0.04em',
+                                    }}>
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
+                            <RepoLink url={project.repo} color={project.color} />
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* PCB slot connector strip at bottom */}
+            {/* PCB connector strip */}
             <div style={{
-                height: '4px',
-                background: `linear-gradient(90deg, ${project.color}00 0%, ${project.color}88 30%, ${project.color}88 70%, ${project.color}00 100%)`,
+                height: '3px',
+                background: `linear-gradient(90deg, ${project.color}00 0%, ${project.color}${isLast ? '44' : '66'} 30%, ${project.color}${isLast ? '44' : '66'} 70%, ${project.color}00 100%)`,
             }} />
         </motion.div>
     );
@@ -233,12 +308,13 @@ const Projects = ({ isDark }) => {
                 </motion.div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {PROJECTS.map((project) => (
+                    {PROJECTS.map((project, index) => (
                         <ProjectCard
                             key={project.id}
                             project={project}
                             isDark={isDark}
                             isExpanded={expandedId === project.id}
+                            isLast={index === PROJECTS.length - 1}
                             onToggle={() => setExpandedId(expandedId === project.id ? null : project.id)}
                         />
                     ))}
