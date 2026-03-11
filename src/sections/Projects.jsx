@@ -65,20 +65,6 @@ const PROJECTS = [
     {
         id: 'p5',
         number: '05',
-        title: 'Keysight ADS Microstrip Simulations',
-        subtitle: 'RF / microwave line design & validation',
-        problem: 'Designing microstrip transmission lines for matching networks requires accounting for substrate permittivity, conductor losses, and frequency-dependent dispersion that analytical formulas approximate poorly above 5 GHz.',
-        approach: 'ADS Momentum EM simulations for 50Ω microstrip lines on FR-4 and Rogers RO4003C substrates. Swept S-parameter analysis from 1 GHz to 10 GHz; results compared against LineCalc analytical predictions. Post-processed S2P data in MATLAB for statistical deviation analysis.',
-        outcome: '<0.3 dB insertion loss deviation between simulation and theoretical model at 5 GHz. Substrate loss tangent identified as dominant error contributor above 6 GHz; RO4003C outperforms FR-4 by 0.9 dB at 10 GHz.',
-        lessons: 'Mesh density in Momentum has non-linear accuracy impact. Too coarse at high frequencies introduces ~1.2 dB error; too fine makes solve time impractical. Frequency-adaptive mesh at 20 cells/wavelength struck the right balance.',
-        stack: ['Keysight ADS', 'Momentum EM Solver', 'LineCalc', 'MATLAB', 'S-parameter Analysis'],
-        color: '#394139',
-        icon: '📡',
-        repo: null,
-    },
-    {
-        id: 'p6',
-        number: '06',
         title: 'LinkUp Notes — Secure Android Notes App',
         subtitle: 'Offline-first notes with AES-256 encryption & biometric lock',
         problem: 'Most note-taking apps either lack meaningful security or require cloud connectivity, exposing sensitive personal notes to data breaches or loss of access offline. A fully local solution was needed with hardware-backed encryption and zero-trust access control at both app and note level.',
@@ -90,6 +76,21 @@ const PROJECTS = [
         icon: '🔐',
         repo: 'https://github.com/kilavi-musyoki/notes-app.git',
     },
+    {
+        id: 'p6',
+        number: '06',
+        title: 'Keysight ADS Microstrip Simulations',
+        subtitle: 'RF / microwave line design & validation',
+        problem: 'Designing microstrip transmission lines for matching networks requires accounting for substrate permittivity, conductor losses, and frequency-dependent dispersion that analytical formulas approximate poorly above 5 GHz.',
+        approach: 'ADS Momentum EM simulations for 50Ω microstrip lines on FR-4 and Rogers RO4003C substrates. Swept S-parameter analysis from 1 GHz to 10 GHz; results compared against LineCalc analytical predictions. Post-processed S2P data in MATLAB for statistical deviation analysis.',
+        outcome: '<0.3 dB insertion loss deviation between simulation and theoretical model at 5 GHz. Substrate loss tangent identified as dominant error contributor above 6 GHz; RO4003C outperforms FR-4 by 0.9 dB at 10 GHz.',
+        lessons: 'Mesh density in Momentum has non-linear accuracy impact. Too coarse at high frequencies introduces ~1.2 dB error; too fine makes solve time impractical. Frequency-adaptive mesh at 20 cells/wavelength struck the right balance.',
+        stack: ['Keysight ADS', 'Momentum EM Solver', 'LineCalc', 'MATLAB', 'S-parameter Analysis'],
+        color: '#394139',
+        icon: '📡',
+        repo: null,
+    },
+    
 ];
 
 const RepoLink = ({ url, color }) => {
