@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // ── Responsive hook ────────────────────────────────────────────────────────────
 const useWindowWidth = () => {
@@ -15,7 +15,7 @@ const useWindowWidth = () => {
 };
 
 // ── Oscilloscope waveform generator ───────────────────────────────────────────
-const generateWavePath = (text, isTyping, width = 480, height = 80) => {
+const generateWavePath = (text, isTyping, width = 480, height = 100) => {
     const amplitude = Math.min(8 + text.length * 0.4, 32);
     const freq = isTyping ? 0.06 : 0.03;
     const points = [];
@@ -26,15 +26,41 @@ const generateWavePath = (text, isTyping, width = 480, height = 80) => {
     return `M${points.join(' L')}`;
 };
 
+// ── ECG pulse path: flat → spike → flat ───────────────────────────────────────
+const generateEcgPath = (progress, width = 480, height = 100) => {
+    // progress 0→1 sweeps the pulse across the screen
+    const mid = height / 2;
+    const pulseCenter = progress * width;
+    const points = [];
+    for (let x = 0; x <= width; x += 3) {
+        const dx = x - pulseCenter;
+        let y = mid;
+        if (Math.abs(dx) < 60) {
+            // QRS complex shape
+            if (dx < -30) y = mid + (dx + 30) * 0.3;
+            else if (dx < -10) y = mid - (dx + 30) * 1.4;
+            else if (dx < 0)   y = mid + dx * 4.5;
+            else if (dx < 10)  y = mid - dx * 5.5;
+            else if (dx < 20)  y = mid + (dx - 10) * 1.8;
+            else               y = mid - (dx - 20) * 0.4;
+        }
+        points.push(`${x},${y}`);
+    }
+    return `M${points.join(' L')}`;
+};
+
 const Contact = ({ isDark }) => {
     const formRef        = useRef(null);
     const rafRef         = useRef(null);
     const typingTimerRef = useRef(null);
 
-    const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
-    const [status,   setStatus]   = useState('idle'); // idle | sending | sent | error
-    const [isTyping, setIsTyping] = useState(false);
-    const [wavePath, setWavePath] = useState('');
+    const [formData,    setFormData]    = useState({ name: '', email: '', subject: '', message: '' });
+    const [status,      setStatus]      = useState('idle'); // idle | sending | sent | error
+    const [isTyping,    setIsTyping]    = useState(false);
+    const [wavePath,    setWavePath]    = useState('');
+    const [ecgProgress, setEcgProgress] = useState(0);   // 0→1 for pulse sweep
+    const [ecgPath,     setEcgPath]     = useState('');
+    const [ecgPhase,    setEcgPhase]    = useState(0);   // counts completed sweeps
 
     // ── Google Sheets webhook ──────────────────────────────────────────────────
     const webhook = import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK;
@@ -62,19 +88,56 @@ const Contact = ({ isDark }) => {
     const waveColor        = isDark ? '#9ca09c'                     : '#50b1ce';
     const btnColor         = isDark ? '#394139'                     : '#ffffff';
     const errorColor       = '#FF5A3C';
+    const ecgColor         = isDark ? '#4ade80'                     : '#16a34a';
 
-    // ── Oscilloscope animation ─────────────────────────────────────────────────
+    // ── Idle/typing oscilloscope animation ────────────────────────────────────
     useEffect(() => {
+        if (status !== 'idle' && status !== 'sending') {
+            cancelAnimationFrame(rafRef.current);
+            return;
+        }
         const animateWave = () => {
             const text = formData.name + formData.email + formData.subject + formData.message;
             setWavePath(generateWavePath(text, isTyping));
             rafRef.current = requestAnimationFrame(animateWave);
         };
-        if (status === 'idle' || status === 'sending') {
-            rafRef.current = requestAnimationFrame(animateWave);
-        }
+        rafRef.current = requestAnimationFrame(animateWave);
         return () => cancelAnimationFrame(rafRef.current);
     }, [formData, isTyping, status]);
+
+    // ── ECG success animation: 3 sweeps then hold flatline ───────────────────
+    useEffect(() => {
+        if (status !== 'sent') {
+            setEcgProgress(0);
+            setEcgPhase(0);
+            return;
+        }
+        let progress = 0;
+        let phase    = 0;
+        const totalSweeps = 3;
+        const speed = 0.008; // progress per frame
+
+        const animate = () => {
+            progress += speed;
+            if (progress >= 1.15) {
+                progress = 0;
+                phase += 1;
+            }
+            if (phase >= totalSweeps) {
+                // flatline after 3 pulses
+                setEcgPath(generateEcgPath(2, 480, 100)); // off-screen → flat
+                setEcgPhase(phase);
+                return;
+            }
+            setEcgProgress(progress);
+            setEcgPath(generateEcgPath(progress, 480, 100));
+            setEcgPhase(phase);
+            rafRef.current = requestAnimationFrame(animate);
+        };
+
+        rafRef.current = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(rafRef.current);
+    }, [status]);
 
     // ── Input handler ──────────────────────────────────────────────────────────
     const handleInput = useCallback((e) => {
@@ -113,45 +176,13 @@ const Contact = ({ isDark }) => {
             setTimeout(() => {
                 setStatus('idle');
                 setFormData({ name: '', email: '', subject: '', message: '' });
-            }, 5000);
+            }, 6000);
         } catch (err) {
             console.error('Contact send error:', err);
             setStatus('error');
             setTimeout(() => setStatus('idle'), 4000);
         }
     };
-
-    // ── CV download handler ────────────────────────────────────────────────────
-    // PDF must be placed at: public/assets/Kilavi_Musyoki_CV.pdf
-    const handleCvDownload = useCallback((e) => {
-        e.preventDefault();
-        logToSheet({
-            type:      'cv_download',
-            timestamp: new Date().toISOString(),
-            referrer:  document.referrer   || null,
-            userAgent: navigator.userAgent || null,
-        });
-        // Force browser download by fetching as blob
-        fetch('/assets/Kilavi_Musyoki_CV.pdf')
-            .then(res => {
-                if (!res.ok) throw new Error('File not found');
-                return res.blob();
-            })
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-                const a   = document.createElement('a');
-                a.href     = url;
-                a.download = 'Kilavi_Musyoki_CV.pdf';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            })
-            .catch(() => {
-                // Fallback: open in new tab if blob fetch fails
-                window.open('/assets/Kilavi_Musyoki_CV.pdf', '_blank', 'noopener,noreferrer');
-            });
-    }, [logToSheet]);
 
     // ── Shared style helpers ───────────────────────────────────────────────────
     const labelStyle = {
@@ -164,14 +195,13 @@ const Contact = ({ isDark }) => {
         marginBottom:  '4px',
     };
 
-    // ── Scope status label ─────────────────────────────────────────────────────
-    const scopeStatusLabel = isTyping
-        ? 'RECEIVING...'
-        : status === 'sent'
-            ? 'SIGNAL CLEAR'
-            : status === 'sending'
-                ? 'TRANSMITTING...'
-                : 'STANDBY';
+    // ── Scope labels ───────────────────────────────────────────────────────────
+    const isFlatline = status === 'sent' && ecgPhase >= 3;
+    const scopeStatusLabel =
+        status === 'sent'    ? (isFlatline ? 'SIGNAL CLEAR ✓' : 'TRANSMITTING PULSE...')
+        : status === 'sending' ? 'TRANSMITTING...'
+        : isTyping             ? 'RECEIVING...'
+        : 'STANDBY';
 
     return (
         <section
@@ -255,18 +285,10 @@ const Contact = ({ isDark }) => {
                                     value: 'github.com/kilavi-musyoki',
                                     href:  'https://github.com/kilavi-musyoki',
                                 },
-                                {
-                                    icon:    '⬇️',
-                                    label:   'Download CV',
-                                    value:   'Kilavi_Musyoki_CV.pdf',
-                                    href:    '#',
-                                    onClick: handleCvDownload,
-                                },
                             ].map((item, i) => (
                                 <motion.a
                                     key={item.label}
                                     href={item.href}
-                                    onClick={item.onClick}
                                     target={item.href.startsWith('http') ? '_blank' : undefined}
                                     rel="noopener noreferrer"
                                     initial={{ opacity: 0, x: -10 }}
@@ -319,29 +341,31 @@ const Contact = ({ isDark }) => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                     >
-                        {/* Oscilloscope display */}
+                        {/* ── Oscilloscope display ── */}
                         <div style={{
-                            marginBottom: '16px',
-                            height:       '100px',
-                            position:     'relative',
-                            background:   scopeBg,
-                            border:       `2px solid ${scopeBorderColor}`,
-                            borderRadius: '8px',
-                            overflow:     'hidden',
-                            transition:   'background 0.4s, border-color 0.4s',
+                            marginBottom:  '16px',
+                            height:        '100px',
+                            position:      'relative',
+                            background:    status === 'sent' ? (isDark ? '#000f04' : '#f0faf2') : scopeBg,
+                            border:        `2px solid ${status === 'sent' ? ecgColor + '88' : status === 'error' ? errorColor + '88' : scopeBorderColor}`,
+                            borderRadius:  '8px',
+                            overflow:      'hidden',
+                            transition:    'background 0.5s, border-color 0.5s',
+                            boxShadow:     status === 'sent' ? `0 0 20px ${ecgColor}22` : 'none',
                         }}>
                             {/* Grid */}
                             <div style={{
                                 position:        'absolute',
                                 inset:           0,
                                 backgroundImage: `
-                                    linear-gradient(${scopeGridColor} 1px, transparent 1px),
-                                    linear-gradient(90deg, ${scopeGridColor} 1px, transparent 1px)
+                                    linear-gradient(${status === 'sent' ? ecgColor + '09' : scopeGridColor} 1px, transparent 1px),
+                                    linear-gradient(90deg, ${status === 'sent' ? ecgColor + '09' : scopeGridColor} 1px, transparent 1px)
                                 `,
                                 backgroundSize: '40px 40px',
+                                transition: 'all 0.5s',
                             }} />
 
-                            {/* Wave SVG */}
+                            {/* Wave / ECG SVG */}
                             <svg
                                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
                                 viewBox="0 0 480 100"
@@ -349,13 +373,32 @@ const Contact = ({ isDark }) => {
                             >
                                 {status === 'sent' ? (
                                     <>
-                                        <line x1="0" y1="50" x2="480" y2="50" stroke={accentColor} strokeWidth="1.5" opacity="0.6" />
-                                        <motion.circle
-                                            cx="240" cy="50" r="0"
-                                            fill={`${accentColor}44`}
-                                            animate={{ r: [0, 80, 0] }}
-                                            transition={{ duration: 1.5, ease: 'easeOut' }}
+                                        {/* Trailing glow line behind ECG pulse */}
+                                        <path
+                                            d={ecgPath}
+                                            stroke={ecgColor}
+                                            strokeWidth="2"
+                                            fill="none"
+                                            opacity="0.9"
+                                            filter="url(#glow)"
                                         />
+                                        <path
+                                            d={ecgPath}
+                                            stroke={ecgColor}
+                                            strokeWidth="5"
+                                            fill="none"
+                                            opacity="0.15"
+                                        />
+                                        {/* Glow filter */}
+                                        <defs>
+                                            <filter id="glow" x="-20%" y="-50%" width="140%" height="200%">
+                                                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                                <feMerge>
+                                                    <feMergeNode in="blur" />
+                                                    <feMergeNode in="SourceGraphic" />
+                                                </feMerge>
+                                            </filter>
+                                        </defs>
                                     </>
                                 ) : status === 'error' ? (
                                     <line x1="0" y1="50" x2="480" y2="50" stroke={errorColor} strokeWidth="1.5" opacity="0.8" />
@@ -365,33 +408,86 @@ const Contact = ({ isDark }) => {
                             </svg>
 
                             {/* Scope readouts */}
-                            <div style={{ position: 'absolute', top: '5px', left: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: scopeLabelColor }}>
-                                CH1: SIGNAL · 50mV/div
+                            <div style={{
+                                position: 'absolute', top: '6px', left: '10px',
+                                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+                                color: status === 'sent' ? ecgColor + 'cc' : scopeLabelColor,
+                                transition: 'color 0.4s',
+                            }}>
+                                {status === 'sent' ? 'BIO · PULSE DETECTED' : 'CH1: SIGNAL · 50mV/div'}
                             </div>
-                            <div style={{ position: 'absolute', top: '5px', right: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: status === 'error' ? errorColor : scopeLabelColor, transition: 'color 0.3s' }}>
+                            <div style={{
+                                position: 'absolute', top: '6px', right: '10px',
+                                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+                                color: status === 'sent' ? ecgColor : status === 'error' ? errorColor : scopeLabelColor,
+                                transition: 'color 0.3s',
+                            }}>
                                 {scopeStatusLabel}
                             </div>
+
+                            {/* BPM readout on success */}
+                            <AnimatePresence>
+                                {status === 'sent' && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ delay: 0.3 }}
+                                        style={{
+                                            position:   'absolute',
+                                            bottom:     '7px',
+                                            right:      '10px',
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontSize:   '0.6rem',
+                                            color:      ecgColor,
+                                            letterSpacing: '0.06em',
+                                        }}
+                                    >
+                                        {isFlatline ? '— BPM' : '72 BPM'}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         {/* Status messages */}
-                        {status === 'sent' && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -6 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: accentColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}
-                            >
-                                ✓ SIGNAL TRANSMITTED. AWAITING RESPONSE...
-                            </motion.div>
-                        )}
-                        {status === 'error' && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -6 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: errorColor, textAlign: 'center', marginBottom: '12px', letterSpacing: '0.05em' }}
-                            >
-                                ✗ TRANSMISSION FAILED. CHECK SIGNAL.
-                            </motion.div>
-                        )}
+                        <AnimatePresence>
+                            {status === 'sent' && (
+                                <motion.div
+                                    key="sent"
+                                    initial={{ opacity: 0, y: -6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    style={{
+                                        fontFamily: 'JetBrains Mono, monospace',
+                                        fontSize: '0.75rem',
+                                        color: ecgColor,
+                                        textAlign: 'center',
+                                        marginBottom: '12px',
+                                        letterSpacing: '0.05em',
+                                    }}
+                                >
+                                    ✓ SIGNAL TRANSMITTED. AWAITING RESPONSE...
+                                </motion.div>
+                            )}
+                            {status === 'error' && (
+                                <motion.div
+                                    key="error"
+                                    initial={{ opacity: 0, y: -6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    style={{
+                                        fontFamily: 'JetBrains Mono, monospace',
+                                        fontSize: '0.75rem',
+                                        color: errorColor,
+                                        textAlign: 'center',
+                                        marginBottom: '12px',
+                                        letterSpacing: '0.05em',
+                                    }}
+                                >
+                                    ✗ TRANSMISSION FAILED. CHECK SIGNAL.
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Form */}
                         <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
