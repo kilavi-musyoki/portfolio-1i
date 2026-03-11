@@ -16,7 +16,7 @@ const PROJECTS = [
         lessons:
             'Separating voter identity from vote data was essential for anonymity while still preventing double voting. Implementing a cryptographic hash chain provided an auditable vote sequence but required careful transaction handling to maintain consistency. Strict TypeScript typing across frontend and backend significantly reduced runtime errors during development.',
         stack: ['React', 'TypeScript', 'Node.js / Express', 'PostgreSQL', 'Prisma ORM', 'JWT Authentication', 'Tailwind CSS', 'Docker'],
-        color: '#2563eb',
+        color: '#c4c8c4',
         icon: '🗳️',
         repo: 'https://github.com/kilavi-musyoki/voting-website.git',
     },
@@ -86,7 +86,7 @@ const PROJECTS = [
         outcome: 'Fully functional offline notes app with hardware-backed encryption, per-note locking, multi-select bulk actions, auto-save, crash recovery, and a 30-day soft-delete trash system. All security layers operate without any network dependency.',
         lessons: 'Note-level locking required careful separation between the biometric prompt lifecycle and Compose recomposition — tightly coupling them caused the auth dialog to dismiss unexpectedly on rotation. Android Keystore key invalidation on biometric enrollment changes also needed explicit handling to avoid silent decryption failures.',
         stack: ['Kotlin', 'Jetpack Compose', 'Material 3', 'Room / SQLite', 'AES-256-GCM', 'Android Keystore', 'AndroidX Biometric', 'Kotlin Coroutines'],
-        color: '#16a34a',
+        color: '#525752',
         icon: '🔐',
         repo: 'https://github.com/kilavi-musyoki/notes-app.git',
     },
@@ -133,17 +133,12 @@ const RepoLink = ({ url, color }) => {
     );
 };
 
-const ProjectCard = ({ project, isDark, isExpanded, onToggle, isLast }) => {
+const ProjectCard = ({ project, isDark, isExpanded, onToggle }) => {
     const textColor = isDark ? '#ced0ce' : '#1A1A2E';
     const dimColor = isDark ? 'rgba(156,160,156,0.9)' : 'rgba(26,26,46,0.5)';
 
-    // Last card gets a more muted, faded treatment but still visible
-    const opacity = isLast ? 0.72 : 1;
-    const borderOpacity = isLast ? '1a' : (isExpanded ? '55' : '22');
-    const bgOpacity = isLast ? '05' : (isExpanded ? '0a' : '06');
-
-    const borderColor = `${project.color}${borderOpacity}`;
-    const bgCard = `${project.color}${bgOpacity}`;
+    const borderColor = `${project.color}${isExpanded ? '55' : '22'}`;
+    const bgCard = `${project.color}${isExpanded ? '0a' : '06'}`;
 
     return (
         <motion.div
@@ -155,15 +150,13 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle, isLast }) => {
             className="pcb-card"
             style={{
                 border: `1px solid ${borderColor}`,
-                background: isExpanded ? `${project.color}0a` : bgCard,
+                background: bgCard,
                 borderRadius: '4px',
                 overflow: 'hidden',
                 cursor: 'pointer',
-                opacity: opacity,
                 boxShadow: isExpanded ? `0 0 24px ${project.color}14` : 'none',
                 transition: 'all 0.3s ease',
             }}
-            whileHover={{ opacity: isLast ? 0.92 : 1 }}
             onClick={onToggle}
         >
             {/* Card header */}
@@ -188,7 +181,7 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle, isLast }) => {
                     </div>
                     <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: project.color, letterSpacing: '0.1em', opacity: isLast ? 0.7 : 1 }}>
+                            <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: project.color, letterSpacing: '0.1em' }}>
                                 MODULE {project.number}
                             </span>
                             <div style={{ width: '40px', height: '1px', background: `${project.color}33` }} />
@@ -206,7 +199,7 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle, isLast }) => {
                 <motion.div
                     animate={{ rotate: isExpanded ? 45 : 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ color: project.color, fontSize: '1.2rem', flexShrink: 0, marginTop: '4px', opacity: isLast ? 0.6 : 1 }}
+                    style={{ color: project.color, fontSize: '1.2rem', flexShrink: 0, marginTop: '4px' }}
                 >
                     +
                 </motion.div>
@@ -276,7 +269,7 @@ const ProjectCard = ({ project, isDark, isExpanded, onToggle, isLast }) => {
             {/* PCB connector strip */}
             <div style={{
                 height: '3px',
-                background: `linear-gradient(90deg, ${project.color}00 0%, ${project.color}${isLast ? '44' : '66'} 30%, ${project.color}${isLast ? '44' : '66'} 70%, ${project.color}00 100%)`,
+                background: `linear-gradient(90deg, ${project.color}00 0%, ${project.color}66 30%, ${project.color}66 70%, ${project.color}00 100%)`,
             }} />
         </motion.div>
     );
@@ -308,13 +301,12 @@ const Projects = ({ isDark }) => {
                 </motion.div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {PROJECTS.map((project, index) => (
+                    {PROJECTS.map((project) => (
                         <ProjectCard
                             key={project.id}
                             project={project}
                             isDark={isDark}
                             isExpanded={expandedId === project.id}
-                            isLast={index === PROJECTS.length - 1}
                             onToggle={() => setExpandedId(expandedId === project.id ? null : project.id)}
                         />
                     ))}
